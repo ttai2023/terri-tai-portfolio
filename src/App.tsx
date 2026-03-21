@@ -2,7 +2,7 @@ import React, { ReactNode, useState, useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { Cpu, Github, Linkedin, Mail, ExternalLink, Code2, Brain, Rocket, Target, Microscope } from 'lucide-react';
-import { PROJECTS, EXPERIENCES, SKILLS } from './constants';
+import { PROJECTS, EXPERIENCES, SKILLS } from '@/constants';
 
 // --- HUD THEME COMPONENTS --- //
 
