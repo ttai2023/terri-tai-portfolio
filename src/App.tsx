@@ -1,8 +1,8 @@
 import React, { ReactNode, useState, useEffect } from 'react';
-import { HashRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Link, useLocation, Navigate} from 'react-router-dom';
 import { motion } from 'motion/react';
 import { Cpu, Github, Linkedin, Mail, ExternalLink, Code2, Brain, Rocket, Target, Microscope } from 'lucide-react';
-import { PROJECTS, EXPERIENCES, SKILLS } from '@/constants';
+import { PROJECTS, EXPERIENCES, SKILLS } from './constants';
 
 // --- HUD THEME COMPONENTS --- //
 
@@ -420,6 +420,7 @@ export default function App() {
             <Route path="/experience" element={<ExperiencePage />} />
             <Route path="/projects" element={<ProjectsPage />} />
             <Route path="/skills" element={<SkillsPage />} />
+            <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </main>
         <Footer />
