@@ -2,19 +2,86 @@
 <img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
 </div>
 
-# Run and deploy your AI Studio app
+# TERRI TAI // COMPUTER ENGINEER
 
-This contains everything you need to run your app locally.
+> Designing intelligent systems for autonomy, perception, and real-world impact.
 
-View your app in AI Studio: https://ai.studio/apps/9642c675-f7e6-42ac-951a-679ddd078728
+---
 
-## Run Locally
+## 🧠 SYSTEM PROFILE
 
-**Prerequisites:**  Node.js
+I’m Terri Tai — a Computer Engineering student at UC San Diego focused on building **next-generation autonomous and intelligent systems**.
 
+My work sits at the intersection of:
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+* Robotics
+* Machine Learning
+* Systems Engineering
+
+I approach engineering like system design — not just writing code, but **building architectures that think, adapt, and operate in the real world**.
+
+---
+
+## ⚙️ CURRENT OPERATIONS
+
+* **CSE Tutor @ UC San Diego**
+  Training the next generation of engineers in problem-solving, algorithmic thinking, and software fundamentals.
+
+---
+
+## 🧪 PRIOR MISSIONS
+
+* **RoboCup @ IEEE UCSD (Software Chair)**
+  Led development of autonomous robotic systems for competitive gameplay — integrating perception, planning, and real-time decision-making under constraints.
+
+* **ERL Lab Researcher (UCSD)**
+  Working on cutting-edge research in intelligent systems and robotics, applying algorithms and learning-based approaches to real-world engineering problems.
+
+---
+
+## 🚀 ENGINEERING PHILOSOPHY
+
+I build systems that are:
+
+* **Autonomous** → capable of making decisions under uncertainty
+* **Robust** → designed for real-world constraints, not just ideal cases
+* **Scalable** → engineered beyond prototypes
+* **Intentional** → every component serves a purpose
+
+---
+
+## 🛠️ TECH ARSENAL
+
+* Languages: C++, Python, JavaScript, TypeScript
+* Frameworks: React, Node.js
+* Domains: Robotics, AI/ML, Systems Programming
+
+---
+
+## 🌐 DEPLOYMENT
+
+Live Interface:
+👉 https://ttai2023.github.io/terri-tai-portfolio/
+
+---
+
+## 📡 ESTABLISH CONNECTION
+
+* LinkedIn → https://linkedin.com/in/terri-tai-732a21229
+* GitHub → https://github.com/ttai2023
+
+---
+
+## 🎯 HUMAN SIDE QUESTS
+
+Outside of engineering, I:
+
+* Perform magic
+* Write music
+* Play guitar
+
+Because creativity isn’t separate from engineering — it powers it.
+
+---
+
+> STATUS: BUILDING FUTURE SYSTEMS...
