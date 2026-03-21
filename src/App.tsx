@@ -1,13 +1,42 @@
 import React, { useState, useEffect, ReactNode } from 'react';
 import { HashRouter as Router, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Cpu, Github, Linkedin, Mail, ExternalLink, Code2, Brain, Rocket, Target, Microscope } from 'lucide-react';
+// ✨ Added Volume2 and VolumeX icons for the sound toggle
+import { Cpu, Github, Linkedin, Mail, ExternalLink, Code2, Brain, Rocket, Target, Microscope, Volume2, VolumeX } from 'lucide-react';
 import { PROJECTS, EXPERIENCES, SKILLS } from './constants';
+
+// --- SYNTHESIZED HUD AUDIO --- //
+// Generates a digital "swoosh/blip" dynamically so you don't need MP3 files!
+const playHUDTransitionSound = () => {
+  try {
+    const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+    if (!AudioContext) return;
+    
+    const ctx = new AudioContext();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    
+    // Sci-fi UI tone (starts high, drops fast)
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(1200, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(300, ctx.currentTime + 0.15);
+    
+    // Volume envelope (quiet, quick fade out)
+    gain.gain.setValueAtTime(0.02, ctx.currentTime); // 👈 Very low volume so it's subtle
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+    
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.15);
+  } catch (e) {
+    console.log("Audio playback failed", e);
+  }
+};
 
 // --- HUD THEME COMPONENTS --- //
 
-// 1. Initial System Boot Loading Screen
-// ✨ FIXED: Added React.FC to properly type this so TypeScript knows it can accept a "key" prop!
 const BootSequence: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
   const [text, setText] = useState<string[]>([]);
   const sequence =[
@@ -22,20 +51,18 @@ const BootSequence: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
   useEffect(() => {
     let i = 0;
     const interval = setInterval(() => {
-      setText(prev => [...prev, sequence[i]]);
+      setText(prev =>[...prev, sequence[i]]);
       i++;
       if (i === sequence.length) {
         clearInterval(interval);
-        // Wait half a second after the last message, then trigger completion
         setTimeout(onComplete, 600); 
       }
-    }, 250); // Speed of the boot text
+    }, 250); 
     return () => clearInterval(interval);
   }, [onComplete]);
 
   return (
     <motion.div
-      // This makes the boot screen glitch/blur away when it finishes
       exit={{ opacity: 0, scale: 1.05, filter: "blur(10px) brightness(2)" }}
       transition={{ duration: 0.5, ease: "easeIn" }}
       className="fixed inset-0 z-[99999] bg-[#020b12] flex flex-col justify-center px-8 md:px-24 font-mono text-sm md:text-base pointer-events-none"
@@ -63,6 +90,7 @@ const ScrollToTop = () => {
   return null;
 };
 
+// ✨ UPGRADED: Grid now has a pulsing, breathing background glow
 const GridBackground = () => {
   const[mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
@@ -78,18 +106,30 @@ const GridBackground = () => {
   },[]);
 
   return (
-    <div 
-      className="fixed inset-0 pointer-events-none z-[-1] transition-transform duration-700 ease-out"
-      style={{
-        backgroundColor: '#03101c',
-        backgroundImage: `
-          linear-gradient(rgba(0, 243, 255, 0.1) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(0, 243, 255, 0.1) 1px, transparent 1px)
-        `,
-        backgroundSize: '40px 40px',
-        transform: `translate(${mousePos.x}px, ${mousePos.y}px) scale(1.05)` 
-      }}
-    />
+    <>
+      {/* 1. The moving grid layer */}
+      <div 
+        className="fixed inset-0 pointer-events-none z-[-2] transition-transform duration-700 ease-out"
+        style={{
+          backgroundColor: '#03101c',
+          backgroundImage: `
+            linear-gradient(rgba(0, 243, 255, 0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0, 243, 255, 0.1) 1px, transparent 1px)
+          `,
+          backgroundSize: '40px 40px',
+          transform: `translate(${mousePos.x}px, ${mousePos.y}px) scale(1.05)` 
+        }}
+      />
+      {/* 2. The new breathing pulse layer */}
+      <motion.div
+        animate={{ opacity:[0.3, 0.6, 0.3] }}
+        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+        className="fixed inset-0 pointer-events-none z-[-1]"
+        style={{
+          background: 'radial-gradient(circle at center, rgba(0, 243, 255, 0.08) 0%, transparent 70%)'
+        }}
+      />
+    </>
   );
 };
 
@@ -171,7 +211,8 @@ const SectionHeading: React.FC<{ children: ReactNode; icon: any }> = ({ children
 
 // --- MAIN PORTFOLIO SECTIONS --- //
 
-const Navbar = () => {
+// ✨ UPGRADED: Navbar now accepts sound toggle props
+const Navbar: React.FC<{ soundEnabled: boolean, toggleSound: () => void }> = ({ soundEnabled, toggleSound }) => {
   const location = useLocation();
   
   const navLinks =[
@@ -193,7 +234,7 @@ const Navbar = () => {
             T.TAI
           </span>
         </Link>
-        <div className="hidden md:flex items-center gap-8 text-xs font-mono tracking-widest text-[#00f3ff]/60">
+        <div className="hidden lg:flex items-center gap-8 text-xs font-mono tracking-widest text-[#00f3ff]/60">
           {navLinks.map((link) => (
             <Link 
               key={link.name} 
@@ -201,20 +242,33 @@ const Navbar = () => {
               className={`transition-all duration-300 hover:text-[#00f3ff] hover:drop-shadow-[0_0_8px_#00f3ff] ${
                 location.pathname === link.path ? 'text-[#00f3ff] border-b border-[#00f3ff] pb-1' : ''
               }`}
-            >
-              [{link.name}]
+            >[{link.name}]
             </Link>
           ))}
         </div>
-        <div className="flex items-center gap-4 text-[#00f3ff]">
+        <div className="flex items-center gap-2 md:gap-4 text-[#00f3ff]">
+          
+          {/* ✨ SOUND TOGGLE BUTTON */}
+          <button 
+            onClick={toggleSound}
+            className="flex items-center gap-2 px-2 py-1 md:px-3 md:py-2 hover:bg-[#00f3ff]/10 rounded border border-transparent hover:border-[#00f3ff]/50 transition-all text-xs font-mono mr-2"
+            title="Toggle HUD Sounds"
+          >
+            {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4 opacity-50" />}
+            <span className="hidden sm:inline opacity-70">
+              SND:{soundEnabled ? 'ON' : 'OFF'}
+            </span>
+          </button>
+          <div className="w-px h-6 bg-[#00f3ff]/30 mr-2" />
+
           <a href="mailto:y2tai@ucsd.edu" className="p-2 hover:bg-[#00f3ff]/10 rounded border border-transparent hover:border-[#00f3ff]/50 transition-all">
-            <Mail className="w-5 h-5" />
+            <Mail className="w-4 h-4 md:w-5 md:h-5" />
           </a>
           <a href="https://github.com/ttai2023" target="_blank" rel="noreferrer" className="p-2 hover:bg-[#00f3ff]/10 rounded border border-transparent hover:border-[#00f3ff]/50 transition-all">
-            <Github className="w-5 h-5" />
+            <Github className="w-4 h-4 md:w-5 md:h-5" />
           </a>
           <a href="https://linkedin.com/in/terri-tai-732a21229" target="_blank" rel="noreferrer" className="p-2 hover:bg-[#00f3ff]/10 rounded border border-transparent hover:border-[#00f3ff]/50 transition-all">
-            <Linkedin className="w-5 h-5" />
+            <Linkedin className="w-4 h-4 md:w-5 md:h-5" />
           </a>
         </div>
       </div>
@@ -279,12 +333,15 @@ const TerminalTypingEffect = () => {
 };
 
 const AboutPage = () => (
-  <section className="min-h-[90vh] flex flex-col items-center justify-center px-6 py-12 relative">
+  // 1. Increased py-12 to py-32 md:py-40 to push it away from the header/footer
+  <section className="min-h-screen flex flex-col items-center justify-center px-6 py-12 md:py-12 relative">
     <motion.div 
-      initial={{ opacity: 0, clipPath: "inset(49.8% 0 49.8% 0)" }} 
-      animate={{ opacity: 1, clipPath: "inset(0% 0 0% 0)" }}
+      // 2. Removed the clipPath that was chopping off the glowing shadow!
+      // 3. Replaced it with the same smooth y-axis fade-in used on the other pages
+      initial={{ opacity: 0, y: 40 }} 
+      animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, ease:[0.22, 1, 0.36, 1], delay: 0.2 }}
-      className="w-full max-w-4xl"
+      className="w-full max-w-4xl my-12" // Added my-12 for extra vertical breathing room
     >
       <SciFiPanel className="text-center py-20">
         <motion.div 
@@ -557,6 +614,16 @@ const Footer = () => (
 const AppContent = () => {
   const location = useLocation();
   const[hasBooted, setHasBooted] = useState(false);
+  
+  // ✨ Global Sound State (Defaulted to OFF for good UX)
+  const[soundEnabled, setSoundEnabled] = useState(false);
+
+  // Trigger sound when changing routes!
+  useEffect(() => {
+    if (hasBooted && soundEnabled) {
+      playHUDTransitionSound();
+    }
+  },[location.pathname, hasBooted, soundEnabled]);
 
   return (
     <div className="min-h-screen flex flex-col font-sans selection:bg-[#00f3ff]/30 text-slate-200 overflow-x-hidden relative">
@@ -566,7 +633,12 @@ const AppContent = () => {
 
       <GridBackground />
       <ScrollToTop />
-      <Navbar />
+      
+      {/* Pass sound props to Navbar */}
+      <Navbar 
+        soundEnabled={soundEnabled} 
+        toggleSound={() => setSoundEnabled(!soundEnabled)} 
+      />
       
       <main className="relative pt-16 flex-grow">
         <AnimatePresence mode="wait">
