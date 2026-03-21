@@ -1,7 +1,7 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { Cpu, Github, Linkedin, Mail, ExternalLink, Code2, Brain, Rocket, ChevronRight, Target, Microscope } from 'lucide-react';
+import { Cpu, Github, Linkedin, Mail, ExternalLink, Code2, Brain, Rocket, Target, Microscope } from 'lucide-react';
 import { PROJECTS, EXPERIENCES, SKILLS } from './constants';
 
 // --- HUD THEME COMPONENTS --- //
@@ -87,7 +87,8 @@ const Navbar = () => {
               className={`transition-all duration-300 hover:text-[#00f3ff] hover:drop-shadow-[0_0_8px_#00f3ff] ${
                 location.pathname === link.path ? 'text-[#00f3ff] border-b border-[#00f3ff] pb-1' : ''
               }`}
-            >[{link.name}]
+            >
+              [{link.name}]
             </Link>
           ))}
         </div>
@@ -107,49 +108,62 @@ const Navbar = () => {
   );
 };
 
-// Custom Terminal Typing Component
+// True Character-by-Character Typing Effect
 const TerminalTypingEffect = () => {
-  const p1 = "BUILDING ".split("");
-  const p2 = "FUTURE".split("");
-  const p3 = " SYSTEMS...".split("");
+  const[displayedText, setDisplayedText] = useState("");
+  const fullText = "BUILDING FUTURE SYSTEMS...";
 
-  // Using opacity prevents jarring line-breaks on mobile as the text types out!
-  const charVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1 }
-  };
+  useEffect(() => {
+    let index = 0;
+    const typingSpeed = 80; // Milliseconds per keystroke
+
+    const intervalId = setInterval(() => {
+      if (index <= fullText.length) {
+        setDisplayedText(fullText.slice(0, index));
+        index++;
+      } else {
+        clearInterval(intervalId);
+      }
+    }, typingSpeed);
+
+    return () => clearInterval(intervalId);
+  },[]); // Runs once on component mount
+
+  // Logic to color "FUTURE" cyan based on what has been typed so far
+  const part1 = "BUILDING ";
+  const part2 = "FUTURE";
+  
+  let firstString = "";
+  let highlightString = "";
+  let endString = "";
+
+  if (displayedText.length <= part1.length) {
+    firstString = displayedText;
+  } else if (displayedText.length <= part1.length + part2.length) {
+    firstString = part1;
+    highlightString = displayedText.slice(part1.length);
+  } else {
+    firstString = part1;
+    highlightString = part2;
+    endString = displayedText.slice(part1.length + part2.length);
+  }
 
   return (
-    <motion.h1 
-      className="text-5xl md:text-7xl font-black tracking-tighter text-white mb-6 uppercase"
-      initial="hidden"
-      animate="visible"
-      variants={{
-        hidden: { opacity: 1 },
-        visible: {
-          transition: { staggerChildren: 0.05, delayChildren: 0.5 } // 0.05s between each letter
-        }
-      }}
-    >
-      {p1.map((char, i) => (
-        <motion.span key={`p1-${i}`} variants={charVariants}>{char}</motion.span>
-      ))}
-      <span className="text-[#00f3ff]" style={{ textShadow: '0 0 20px #00f3ff' }}>
-        {p2.map((char, i) => (
-          <motion.span key={`p2-${i}`} variants={charVariants}>{char}</motion.span>
-        ))}
+    <h1 className="text-5xl md:text-7xl font-black tracking-tighter text-white mb-6 uppercase min-h-[1.5em] flex items-center justify-center flex-wrap">
+      <span>
+        {firstString}
+        <span className="text-[#00f3ff]" style={{ textShadow: '0 0 20px #00f3ff' }}>{highlightString}</span>
+        {endString}
       </span>
-      {p3.map((char, i) => (
-        <motion.span key={`p3-${i}`} variants={charVariants}>{char}</motion.span>
-      ))}
       {/* Blinking Block Cursor */}
       <motion.span
         initial={{ opacity: 0 }}
-        animate={{ opacity:[0, 1, 0] }}
+        animate={{ opacity:[1, 0, 1] }}
         transition={{ repeat: Infinity, duration: 0.8, ease: "linear" }}
         className="inline-block w-[0.4em] h-[0.9em] bg-[#00f3ff] ml-2 shadow-[0_0_10px_#00f3ff]"
+        style={{ marginBottom: '-0.1em' }}
       />
-    </motion.h1>
+    </h1>
   );
 };
 
@@ -167,10 +181,10 @@ const AboutPage = () => (
           COMPUTER_ENGINEER // UCSD_2027
         </div>
         
-        {/* Injected Typing Animation */}
+        {/* Injected True Typing Animation */}
         <TerminalTypingEffect />
         
-        {/* Updated Terminal Output with Indentation */}
+        {/* Terminal Output */}
         <div className="text-lg md:text-xl text-[#8ab4f8] mb-12 max-w-2xl mx-auto font-mono leading-relaxed text-left inline-block w-full sm:w-auto">
           <p>&gt; Subject: Terri Yu Chen Tai.</p>
           <p>&gt; Specialization: Autonomous Systems, Robotics & AI.</p>
@@ -210,7 +224,6 @@ const AboutPage = () => (
 );
 
 const ExperiencePage = () => {
-  // Dynamically split experiences into Research vs Technical based on role and company keywords
   const researchLogs = EXPERIENCES.filter(exp => 
     exp.role.toLowerCase().includes('research') || 
     exp.company.toLowerCase().includes('lab')

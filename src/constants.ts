@@ -104,7 +104,7 @@ export const EXPERIENCES: Experience[] =[
   },
   {
     company: "UCSD Triton Research - Lo Lab",
-    role: "Research Assistant",
+    role: "Undergraduate Researcher",
     period: "Jun 2024 - Aug 2024",
     location: "San Diego, CA",
     description:[
@@ -116,7 +116,7 @@ export const EXPERIENCES: Experience[] =[
   },
   {
     company: "Caltech VURP Program",
-    role: "Researcher",
+    role: "Visiting Undergraduate Researcher",
     period: "Jun 2023 - Aug 2023",
     location: "Pasadena, CA",
     description:[
