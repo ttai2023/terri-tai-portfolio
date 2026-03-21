@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { Cpu, Github, Linkedin, Mail, ExternalLink, Code2, Brain, Rocket, ChevronRight, Target } from 'lucide-react';
+import { Cpu, Github, Linkedin, Mail, ExternalLink, Code2, Brain, Rocket, ChevronRight, Target, Microscope } from 'lucide-react';
 import { PROJECTS, EXPERIENCES, SKILLS } from './constants';
 
 // --- HUD THEME COMPONENTS --- //
@@ -87,12 +87,14 @@ const Navbar = () => {
               className={`transition-all duration-300 hover:text-[#00f3ff] hover:drop-shadow-[0_0_8px_#00f3ff] ${
                 location.pathname === link.path ? 'text-[#00f3ff] border-b border-[#00f3ff] pb-1' : ''
               }`}
-            >
-              [{link.name}]
+            >[{link.name}]
             </Link>
           ))}
         </div>
         <div className="flex items-center gap-4 text-[#00f3ff]">
+          <a href="mailto:y2tai@ucsd.edu" className="p-2 hover:bg-[#00f3ff]/10 rounded border border-transparent hover:border-[#00f3ff]/50 transition-all">
+            <Mail className="w-5 h-5" />
+          </a>
           <a href="https://github.com/ttai2023" target="_blank" rel="noreferrer" className="p-2 hover:bg-[#00f3ff]/10 rounded border border-transparent hover:border-[#00f3ff]/50 transition-all">
             <Github className="w-5 h-5" />
           </a>
@@ -102,6 +104,52 @@ const Navbar = () => {
         </div>
       </div>
     </nav>
+  );
+};
+
+// Custom Terminal Typing Component
+const TerminalTypingEffect = () => {
+  const p1 = "BUILDING ".split("");
+  const p2 = "FUTURE".split("");
+  const p3 = " SYSTEMS...".split("");
+
+  // Using opacity prevents jarring line-breaks on mobile as the text types out!
+  const charVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1 }
+  };
+
+  return (
+    <motion.h1 
+      className="text-5xl md:text-7xl font-black tracking-tighter text-white mb-6 uppercase"
+      initial="hidden"
+      animate="visible"
+      variants={{
+        hidden: { opacity: 1 },
+        visible: {
+          transition: { staggerChildren: 0.05, delayChildren: 0.5 } // 0.05s between each letter
+        }
+      }}
+    >
+      {p1.map((char, i) => (
+        <motion.span key={`p1-${i}`} variants={charVariants}>{char}</motion.span>
+      ))}
+      <span className="text-[#00f3ff]" style={{ textShadow: '0 0 20px #00f3ff' }}>
+        {p2.map((char, i) => (
+          <motion.span key={`p2-${i}`} variants={charVariants}>{char}</motion.span>
+        ))}
+      </span>
+      {p3.map((char, i) => (
+        <motion.span key={`p3-${i}`} variants={charVariants}>{char}</motion.span>
+      ))}
+      {/* Blinking Block Cursor */}
+      <motion.span
+        initial={{ opacity: 0 }}
+        animate={{ opacity:[0, 1, 0] }}
+        transition={{ repeat: Infinity, duration: 0.8, ease: "linear" }}
+        className="inline-block w-[0.4em] h-[0.9em] bg-[#00f3ff] ml-2 shadow-[0_0_10px_#00f3ff]"
+      />
+    </motion.h1>
   );
 };
 
@@ -116,24 +164,43 @@ const AboutPage = () => (
       <SciFiPanel className="text-center py-20">
         <div className="inline-flex items-center gap-2 px-4 py-2 border border-[#00f3ff]/50 bg-[#00f3ff]/10 text-[#00f3ff] font-mono text-xs font-bold tracking-[0.2em] mb-8">
           <Target className="w-4 h-4 animate-pulse" />
-          ROBOTICS_ENGINEER // UCSD_2027
+          COMPUTER_ENGINEER // UCSD_2027
         </div>
-        <h1 className="text-5xl md:text-7xl font-black tracking-tighter text-white mb-6 uppercase">
-          BUILDING <span className="text-[#00f3ff]" style={{ textShadow: '0 0 20px #00f3ff' }}>FUTURE</span> SYSTEMS...
-        </h1>
-        <p className="text-lg md:text-xl text-[#8ab4f8] mb-12 max-w-2xl mx-auto font-mono leading-relaxed">
-          &gt; Subject: Terri Tai.<br/>
-          &gt; Specialization: Autonomous Systems, Computer Vision & AI.<br/>
-          &gt; Current Directive: <br/>
-            &gt; Technical Development: Projects @ WIC UCSD<br/>
-            &gt; Hard Hack Director @ HKN UCSD.<br/>
-        </p>
+        
+        {/* Injected Typing Animation */}
+        <TerminalTypingEffect />
+        
+        {/* Updated Terminal Output with Indentation */}
+        <div className="text-lg md:text-xl text-[#8ab4f8] mb-12 max-w-2xl mx-auto font-mono leading-relaxed text-left inline-block w-full sm:w-auto">
+          <p>&gt; Subject: Terri Yu Chen Tai.</p>
+          <p>&gt; Specialization: Autonomous Systems, Robotics & AI.</p>
+          <p>&gt; Current Directive:</p>
+          <div className="pl-6 md:pl-10 ml-2 mt-2 space-y-2 border-l border-[#00f3ff]/40 text-[#00f3ff]">
+            <p className="flex items-start gap-2">
+              <span className="text-slate-500">|-</span> 
+              CSE Tutor @ CSE Department UCSD.
+            </p>
+            <p className="flex items-start gap-2">
+              <span className="text-slate-500">|-</span> 
+              ELC Tutor @ Jacobs School of Engineering UCSD.
+            </p>
+            <p className="flex items-start gap-2">
+              <span className="text-slate-500">|-</span> 
+              Technical Development: Projects @ WIC UCSD.
+            </p>
+            <p className="flex items-start gap-2">
+              <span className="text-slate-500">|-</span> 
+              Hard Hack Director @ HKN UCSD.
+            </p>
+          </div>
+        </div>
+
         <div className="flex flex-wrap items-center justify-center gap-6 font-mono">
           <Link to="/projects" className="group relative px-8 py-4 bg-[#00f3ff]/10 border border-[#00f3ff] text-[#00f3ff] font-bold tracking-widest overflow-hidden transition-all hover:bg-[#00f3ff] hover:text-[#03101c] hover:shadow-[0_0_20px_#00f3ff]">
             <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
             ACCESS_PROJECTS
           </Link>
-          <a href="mailto:y2tai@ucsd.edu" className="px-8 py-4 border border-[#00f3ff]/30 text-white font-bold tracking-widest hover:border-[#00f3ff] hover:bg-[#00f3ff]/5 transition-all">
+          <a href="https://linkedin.com/in/terri-tai-732a21229" target="_blank" rel="noreferrer" className="px-8 py-4 border border-[#00f3ff]/30 text-white font-bold tracking-widest hover:border-[#00f3ff] hover:bg-[#00f3ff]/5 transition-all">
             ESTABLISH_UPLINK
           </a>
         </div>
@@ -142,45 +209,102 @@ const AboutPage = () => (
   </section>
 );
 
-const ExperiencePage = () => (
-  <section className="max-w-7xl mx-auto px-6 py-24 min-h-screen">
-    <SectionHeading icon={Rocket}>System Experience Logs</SectionHeading>
-    <div className="space-y-8">
-      {EXPERIENCES.map((exp, idx) => (
-        <motion.div 
-          key={idx}
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: idx * 0.1 }}
-        >
-          <SciFiPanel>
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 border-b border-[#00f3ff]/20 pb-4">
-              <div>
-                <h3 className="text-2xl font-bold text-white tracking-wide">{exp.role}</h3>
-                <p className="text-[#00f3ff] font-mono mt-1 flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 bg-[#00f3ff] rounded-full animate-pulse" />
-                  {exp.company}
-                </p>
-              </div>
-              <div className="text-left md:text-right font-mono text-sm">
-                <p className="text-[#00f3ff]/80">[{exp.period}]</p>
-                <p className="text-slate-400 mt-1">{exp.location}</p>
-              </div>
-            </div>
-            <ul className="space-y-3">
-              {exp.description.map((item, i) => (
-                <li key={i} className="flex gap-3 text-[#8ab4f8] font-mono text-sm leading-relaxed">
-                  <span className="text-[#00f3ff] mt-0.5">&gt;</span>
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-          </SciFiPanel>
-        </motion.div>
-      ))}
-    </div>
-  </section>
-);
+const ExperiencePage = () => {
+  // Dynamically split experiences into Research vs Technical based on role and company keywords
+  const researchLogs = EXPERIENCES.filter(exp => 
+    exp.role.toLowerCase().includes('research') || 
+    exp.company.toLowerCase().includes('lab')
+  );
+  
+  const techExperiences = EXPERIENCES.filter(exp => 
+    !exp.role.toLowerCase().includes('research') && 
+    !exp.company.toLowerCase().includes('lab')
+  );
+
+  return (
+    <section className="max-w-7xl mx-auto px-6 py-24 min-h-screen">
+      
+      {/* 1. Technical Experience Section */}
+      <div className="mb-24">
+        <SectionHeading icon={Rocket}>Technical Experience</SectionHeading>
+        <div className="space-y-8">
+          {techExperiences.map((exp, idx) => (
+            <motion.div 
+              key={`tech-${idx}`}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: idx * 0.1 }}
+            >
+              <SciFiPanel>
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 border-b border-[#00f3ff]/20 pb-4">
+                  <div>
+                    <h3 className="text-2xl font-bold text-white tracking-wide">{exp.role}</h3>
+                    <p className="text-[#00f3ff] font-mono mt-1 flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 bg-[#00f3ff] rounded-full animate-pulse" />
+                      {exp.company}
+                    </p>
+                  </div>
+                  <div className="text-left md:text-right font-mono text-sm">
+                    <p className="text-[#00f3ff]/80">[{exp.period}]</p>
+                    <p className="text-slate-400 mt-1">{exp.location}</p>
+                  </div>
+                </div>
+                <ul className="space-y-3">
+                  {exp.description.map((item, i) => (
+                    <li key={i} className="flex gap-3 text-[#8ab4f8] font-mono text-sm leading-relaxed">
+                      <span className="text-[#00f3ff] mt-0.5">&gt;</span>
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </SciFiPanel>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+
+      {/* 2. Research Logs Section */}
+      <div>
+        <SectionHeading icon={Microscope}>Research Logs</SectionHeading>
+        <div className="space-y-8">
+          {researchLogs.map((exp, idx) => (
+            <motion.div 
+              key={`research-${idx}`}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: idx * 0.1 }}
+            >
+              <SciFiPanel>
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 border-b border-[#00f3ff]/20 pb-4">
+                  <div>
+                    <h3 className="text-2xl font-bold text-white tracking-wide">{exp.role}</h3>
+                    <p className="text-[#00f3ff] font-mono mt-1 flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 bg-[#00f3ff] rounded-full animate-pulse" />
+                      {exp.company}
+                    </p>
+                  </div>
+                  <div className="text-left md:text-right font-mono text-sm">
+                    <p className="text-[#00f3ff]/80">[{exp.period}]</p>
+                    <p className="text-slate-400 mt-1">{exp.location}</p>
+                  </div>
+                </div>
+                <ul className="space-y-3">
+                  {exp.description.map((item, i) => (
+                    <li key={i} className="flex gap-3 text-[#8ab4f8] font-mono text-sm leading-relaxed">
+                      <span className="text-[#00f3ff] mt-0.5">&gt;</span>
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </SciFiPanel>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+
+    </section>
+  );
+};
 
 const ProjectsPage = () => (
   <section className="max-w-7xl mx-auto px-6 py-24 min-h-screen">
