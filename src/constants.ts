@@ -6,26 +6,35 @@ export const PROJECTS: Project[] = [
     description: "Implemented a 2D U-Net CNN from scratch in PyTorch for automated segmentation on 4-channel multimodal MRI scans. Engineered a custom Dice Loss function to mitigate class imbalance.",
     tags: ["Python", "PyTorch", "Computer Vision", "U-Net"],
     date: "Jan 2024 - Mar 2024",
-    link: "https://github.com/ttai2023"
+    link: "https://github.com/ttai2023/emmywei-territai-ece176-finalproject"
   },
   {
     title: "WayNo Smart Parallel Parking Robot",
     description: "Designed a real-time parallel parking algorithm leveraging sensor fusion and path planning in ROS2. Achieved >95% accuracy in designated spaces.",
     tags: ["Python", "ROS2", "OpenCV", "Robotics"],
-    date: "Sep 2024 - Dec 2024",
-    link: "https://github.com/ttai2023"
+    date: "Sep 2025 - Dec 2025",
+    link: "https://github.com/UCSD-ECEMAE-148/fall-final-project-team-9"
+  },
+  {
+    title: "Professor Card Collector App",
+    description: "Collaborated to build a card collector web app for UCSD professors in a team of 12. Voted best project in class.",
+    tags: ["HTML", "CSS", "Javascript", "Agile/SCRUM"],
+    date: "Jan 2025 - Mar 2025",
+    link: "https://github.com/cse110-sp25-group30/cse110-sp25-group30"
   },
   {
     title: "Text To Tracks Web App",
     description: "Collaborated to create a web app that transforms articles into TikTok-style videos with subtitles. Won Honorable Mention at DiamondHacks 2024.",
     tags: ["Python", "CSS", "Hackathon"],
-    date: "2024"
+    date: "2024",
+    link: "https://github.com/danielbonkowsky/subwaysurfers-text"
   },
   {
     title: "EQ Glasses",
     description: "Constructed a facial recognition algorithm using OpenCV to identify targets and assist in emotion recognition for relationship interactions.",
     tags: ["Python", "OpenCV", "AI"],
-    date: "2024"
+    date: "2024",
+    link: "https://github.com/marcokrause7/EQ-Glasses"
   }
 ];
 
