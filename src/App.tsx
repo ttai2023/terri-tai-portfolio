@@ -1,46 +1,160 @@
-import React, { ReactNode, useState, useEffect } from 'react';
-import { HashRouter as Router, Routes, Route, Link, useLocation, Navigate} from 'react-router-dom';
-import { motion } from 'motion/react';
+import React, { useState, useEffect, ReactNode } from 'react';
+import { HashRouter as Router, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Cpu, Github, Linkedin, Mail, ExternalLink, Code2, Brain, Rocket, Target, Microscope } from 'lucide-react';
 import { PROJECTS, EXPERIENCES, SKILLS } from './constants';
 
 // --- HUD THEME COMPONENTS --- //
 
-// 1. The glowing grid background from the screenshot
-const GridBackground = () => (
-  <div 
-    className="fixed inset-0 pointer-events-none z-[-1]"
-    style={{
-      backgroundColor: '#03101c', // Deep dark teal/blue
-      backgroundImage: `
-        linear-gradient(rgba(0, 243, 255, 0.1) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0, 243, 255, 0.1) 1px, transparent 1px)
-      `,
-      backgroundSize: '40px 40px',
-      backgroundPosition: 'center center'
-    }}
-  />
-);
+// 1. Initial System Boot Loading Screen
+// ✨ FIXED: Added React.FC to properly type this so TypeScript knows it can accept a "key" prop!
+const BootSequence: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
+  const [text, setText] = useState<string[]>([]);
+  const sequence =[
+    "KERNEL BOOT SEQUENCE INITIATED...",
+    "LOADING CORE MODULES...",
+    "MOUNTING VIRTUAL FILE SYSTEMS...",
+    "ESTABLISHING SECURE UPLINK...",
+    "DECRYPTING ADMIN PROFILE...",
+    "ACCESS GRANTED."
+  ];
 
-// 2. The custom Sci-Fi HUD box matching the screenshot's borders (NOW WITH HOVER ANIMATIONS!)
+  useEffect(() => {
+    let i = 0;
+    const interval = setInterval(() => {
+      setText(prev => [...prev, sequence[i]]);
+      i++;
+      if (i === sequence.length) {
+        clearInterval(interval);
+        // Wait half a second after the last message, then trigger completion
+        setTimeout(onComplete, 600); 
+      }
+    }, 250); // Speed of the boot text
+    return () => clearInterval(interval);
+  }, [onComplete]);
+
+  return (
+    <motion.div
+      // This makes the boot screen glitch/blur away when it finishes
+      exit={{ opacity: 0, scale: 1.05, filter: "blur(10px) brightness(2)" }}
+      transition={{ duration: 0.5, ease: "easeIn" }}
+      className="fixed inset-0 z-[99999] bg-[#020b12] flex flex-col justify-center px-8 md:px-24 font-mono text-sm md:text-base pointer-events-none"
+    >
+      {text.map((line, idx) => (
+        <div key={idx} className={idx === sequence.length - 1 ? "text-[#00f3ff] font-bold mt-4 animate-pulse" : "text-[#8ab4f8]/70"}>
+          {idx === sequence.length - 1 ? "" : "> "}{line}
+        </div>
+      ))}
+      <div className="w-3 h-5 bg-[#00f3ff] mt-2 animate-pulse" />
+    </motion.div>
+  );
+};
+
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: "instant", 
+    });
+  },[pathname]);
+
+  return null;
+};
+
+const GridBackground = () => {
+  const[mousePos, setMousePos] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      const x = (e.clientX / window.innerWidth - 0.5) * 20; 
+      const y = (e.clientY / window.innerHeight - 0.5) * 20;
+      setMousePos({ x, y });
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  },[]);
+
+  return (
+    <div 
+      className="fixed inset-0 pointer-events-none z-[-1] transition-transform duration-700 ease-out"
+      style={{
+        backgroundColor: '#03101c',
+        backgroundImage: `
+          linear-gradient(rgba(0, 243, 255, 0.1) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(0, 243, 255, 0.1) 1px, transparent 1px)
+        `,
+        backgroundSize: '40px 40px',
+        transform: `translate(${mousePos.x}px, ${mousePos.y}px) scale(1.05)` 
+      }}
+    />
+  );
+};
+
+const SystemLogs = () => {
+  const [logs, setLogs] = useState<{msg: string, time: string}[]>([]);
+  
+  const logMessages =[
+    "INITIALIZING EXP_LOGS...",
+    "ESTABLISHING SECURE CONNECTION...",
+    "DECRYPTING PREVIOUS ROLES...",
+    "LOADING RESEARCH DATA...",
+    "ACCESS GRANTED."
+  ];
+  
+  useEffect(() => {
+    let currentIndex = 0;
+    const interval = setInterval(() => {
+      if (currentIndex < logMessages.length) {
+        const timestamp = new Date().toISOString().split('T')[1].slice(0,-1);
+        setLogs(prev => [...prev, { msg: logMessages[currentIndex], time: timestamp }]);
+        currentIndex++;
+      } else {
+        clearInterval(interval);
+      }
+    }, 400); 
+    
+    return () => clearInterval(interval);
+  },[]);
+
+  return (
+    <div className="font-mono text-[#00f3ff] text-xs md:text-sm mb-12 bg-[#00f3ff]/5 p-4 border border-[#00f3ff]/20 rounded h-40 flex flex-col justify-end relative overflow-hidden shadow-[inset_0_0_20px_rgba(0,243,255,0.05)]">
+      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#00f3ff]/30 to-transparent animate-[shimmer_2s_infinite]" />
+      
+      {logs.map((log, i) => (
+        <motion.div 
+          key={i} 
+          initial={{ opacity: 0, x: -10 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="flex gap-3 mb-1"
+        >
+          <span className="text-slate-500 opacity-70">[{log.time}]</span>
+          <span className={i === logMessages.length - 1 ? "text-green-400 font-bold" : ""}>
+            {log.msg}
+          </span>
+        </motion.div>
+      ))}
+      <div className="w-2 h-4 bg-[#00f3ff] mt-1 animate-pulse" />
+    </div>
+  );
+};
+
 const SciFiPanel: React.FC<{ children: ReactNode; className?: string }> = ({ children, className = '' }) => (
-  <div className={`relative bg-[#021b2b]/70 border border-[#00f3ff]/40 p-8 shadow-[0_0_15px_rgba(0,243,255,0.15)] backdrop-blur-sm group transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1 hover:bg-[#021b2b]/95 hover:border-[#00f3ff]/80 hover:shadow-[0_0_30px_rgba(0,243,255,0.4)] z-0 hover:z-10 ${className}`}>
-    {/* Decorative HUD Corners */}
+  <div className={`relative bg-[#021b2b]/40 border border-[#00f3ff]/40 p-8 shadow-[0_0_15px_rgba(0,243,255,0.15)] backdrop-blur-sm group transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1 hover:bg-[#021b2b]/50 hover:border-[#00f3ff]/80 hover:shadow-[0_0_30px_rgba(0,243,255,0.4)] z-0 hover:z-10 ${className}`}>
     <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-[#00f3ff] transition-all group-hover:scale-125 group-hover:border-[#00f3ff]" />
     <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-[#00f3ff] transition-all group-hover:scale-125 group-hover:border-[#00f3ff]" />
     <div className="absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2 border-[#00f3ff] transition-all group-hover:scale-125 group-hover:border-[#00f3ff]" />
     <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-[#00f3ff] transition-all group-hover:scale-125 group-hover:border-[#00f3ff]" />
-    {/* Subtle inner grid glow */}
     <div className="absolute inset-0 bg-gradient-to-b from-[#00f3ff]/5 to-transparent pointer-events-none transition-opacity group-hover:opacity-50" />
     <div className="relative z-10">{children}</div>
   </div>
 );
 
-// 3. Fixed TypeScript Error for Section Heading + HUD Styling
 const SectionHeading: React.FC<{ children: ReactNode; icon: any }> = ({ children, icon: Icon }) => (
   <div className="flex items-center gap-4 mb-12">
     <div className="relative w-12 h-12 flex items-center justify-center border border-[#00f3ff] bg-[#00f3ff]/10 shadow-[0_0_10px_rgba(0,243,255,0.3)]">
-      {/* Target reticle styling for the icon */}
       <div className="absolute -top-1 -left-1 w-2 h-2 border-t border-l border-[#00f3ff]" />
       <div className="absolute -bottom-1 -right-1 w-2 h-2 border-b border-r border-[#00f3ff]" />
       <Icon className="w-6 h-6 text-[#00f3ff]" />
@@ -108,28 +222,29 @@ const Navbar = () => {
   );
 };
 
-// True Character-by-Character Typing Effect
 const TerminalTypingEffect = () => {
   const[displayedText, setDisplayedText] = useState("");
   const fullText = "BUILDING FUTURE SYSTEMS...";
 
   useEffect(() => {
     let index = 0;
-    const typingSpeed = 80; // Milliseconds per keystroke
+    const typingSpeed = 80;
 
-    const intervalId = setInterval(() => {
-      if (index <= fullText.length) {
-        setDisplayedText(fullText.slice(0, index));
-        index++;
-      } else {
-        clearInterval(intervalId);
-      }
-    }, typingSpeed);
+    const delayStart = setTimeout(() => {
+      const intervalId = setInterval(() => {
+        if (index <= fullText.length) {
+          setDisplayedText(fullText.slice(0, index));
+          index++;
+        } else {
+          clearInterval(intervalId);
+        }
+      }, typingSpeed);
+      return () => clearInterval(intervalId);
+    }, 800);
 
-    return () => clearInterval(intervalId);
-  },[]); // Runs once on component mount
+    return () => clearTimeout(delayStart);
+  },[]);
 
-  // Logic to color "FUTURE" cyan based on what has been typed so far
   const part1 = "BUILDING ";
   const part2 = "FUTURE";
   
@@ -149,12 +264,10 @@ const TerminalTypingEffect = () => {
   }
 
   return (
-    // Replaced flex wrapping with standard text-center so the cursor stays anchored to the text
     <h1 className="text-5xl md:text-7xl font-black tracking-tighter text-white mb-6 uppercase min-h-[1.5em] text-center">
       {firstString}
       <span className="text-[#00f3ff]" style={{ textShadow: '0 0 20px #00f3ff' }}>{highlightString}</span>
       {endString}
-      {/* Blinking Block Cursor */}
       <motion.span
         initial={{ opacity: 0 }}
         animate={{ opacity:[1, 0, 1] }}
@@ -166,24 +279,32 @@ const TerminalTypingEffect = () => {
 };
 
 const AboutPage = () => (
-  <section className="min-h-[90vh] flex flex-col items-center justify-center px-6 relative">
+  <section className="min-h-[90vh] flex flex-col items-center justify-center px-6 py-12 relative">
     <motion.div 
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.5 }}
+      initial={{ opacity: 0, clipPath: "inset(49.8% 0 49.8% 0)" }} 
+      animate={{ opacity: 1, clipPath: "inset(0% 0 0% 0)" }}
+      transition={{ duration: 0.8, ease:[0.22, 1, 0.36, 1], delay: 0.2 }}
       className="w-full max-w-4xl"
     >
       <SciFiPanel className="text-center py-20">
-        <div className="inline-flex items-center gap-2 px-4 py-2 border border-[#00f3ff]/50 bg-[#00f3ff]/10 text-[#00f3ff] font-mono text-xs font-bold tracking-[0.2em] mb-8">
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1, duration: 0.5 }}
+          className="inline-flex items-center gap-2 px-4 py-2 border border-[#00f3ff]/50 bg-[#00f3ff]/10 text-[#00f3ff] font-mono text-xs font-bold tracking-[0.2em] mb-8"
+        >
           <Target className="w-4 h-4 animate-pulse" />
           COMPUTER_ENGINEER // UCSD_2027
-        </div>
+        </motion.div>
         
-        {/* Injected True Typing Animation */}
         <TerminalTypingEffect />
         
-        {/* Terminal Output */}
-        <div className="text-lg md:text-xl text-[#8ab4f8] mb-12 max-w-2xl mx-auto font-mono leading-relaxed text-left inline-block w-full sm:w-auto">
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 2.2, duration: 0.5 }}
+          className="text-lg md:text-xl text-[#8ab4f8] mb-12 max-w-2xl mx-auto font-mono leading-relaxed text-left inline-block w-full sm:w-auto"
+        >
           <p>&gt; Subject: Terri Yu Chen Tai.</p>
           <p>&gt; Specialization: Autonomous Systems, Robotics & AI.</p>
           <p>&gt; Current Directive:</p>
@@ -205,9 +326,14 @@ const AboutPage = () => (
               Hard Hack Director @ HKN UCSD.
             </p>
           </div>
-        </div>
+        </motion.div>
 
-        <div className="flex flex-wrap items-center justify-center gap-6 font-mono">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 2.5, duration: 0.5 }}
+          className="flex flex-wrap items-center justify-center gap-6 font-mono"
+        >
           <Link to="/projects" className="group relative px-8 py-4 bg-[#00f3ff]/10 border border-[#00f3ff] text-[#00f3ff] font-bold tracking-widest overflow-hidden transition-all hover:bg-[#00f3ff] hover:text-[#03101c] hover:shadow-[0_0_20px_#00f3ff]">
             <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
             ACCESS_PROJECTS
@@ -215,7 +341,7 @@ const AboutPage = () => (
           <a href="https://linkedin.com/in/terri-tai-732a21229" target="_blank" rel="noreferrer" className="px-8 py-4 border border-[#00f3ff]/30 text-white font-bold tracking-widest hover:border-[#00f3ff] hover:bg-[#00f3ff]/5 transition-all">
             ESTABLISH_UPLINK
           </a>
-        </div>
+        </motion.div>
       </SciFiPanel>
     </motion.div>
   </section>
@@ -235,16 +361,22 @@ const ExperiencePage = () => {
   return (
     <section className="max-w-7xl mx-auto px-6 py-24 min-h-screen">
       
-      {/* 1. Technical Experience Section */}
+      <SystemLogs />
+
       <div className="mb-24">
         <SectionHeading icon={Rocket}>Technical Experience</SectionHeading>
         <div className="space-y-8">
           {techExperiences.map((exp, idx) => (
             <motion.div 
               key={`tech-${idx}`}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: idx * 0.1 }}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }} 
+              transition={{ 
+                duration: 0.7, 
+                delay: idx * 0.1,
+                ease:[0.22, 1, 0.36, 1] 
+              }}
             >
               <SciFiPanel>
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 border-b border-[#00f3ff]/20 pb-4">
@@ -274,16 +406,20 @@ const ExperiencePage = () => {
         </div>
       </div>
 
-      {/* 2. Research Logs Section */}
       <div>
         <SectionHeading icon={Microscope}>Research Logs</SectionHeading>
         <div className="space-y-8">
           {researchLogs.map((exp, idx) => (
             <motion.div 
               key={`research-${idx}`}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: idx * 0.1 }}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ 
+                duration: 0.7, 
+                delay: idx * 0.1,
+                ease:[0.22, 1, 0.36, 1]
+              }}
             >
               <SciFiPanel>
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 border-b border-[#00f3ff]/20 pb-4">
@@ -312,7 +448,6 @@ const ExperiencePage = () => {
           ))}
         </div>
       </div>
-
     </section>
   );
 };
@@ -324,9 +459,14 @@ const ProjectsPage = () => (
       {PROJECTS.map((project, idx) => (
         <motion.div 
           key={idx}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: idx * 0.1 }}
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ 
+            duration: 0.7, 
+            delay: idx * 0.1,
+            ease:[0.22, 1, 0.36, 1]
+          }}
           className="h-full"
         >
           <SciFiPanel className="h-full flex flex-col">
@@ -363,9 +503,14 @@ const SkillsPage = () => (
       {SKILLS.map((group, idx) => (
         <motion.div 
           key={idx}
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: idx * 0.1 }}
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ 
+            duration: 0.7, 
+            delay: idx * 0.1,
+            ease:[0.22, 1, 0.36, 1]
+          }}
         >
           <SciFiPanel>
             <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-3 border-b border-[#00f3ff]/20 pb-4">
@@ -387,7 +532,7 @@ const SkillsPage = () => (
 );
 
 const Footer = () => (
-  <footer className="border-t border-[#00f3ff]/20 bg-[#020b12] py-8 px-6 mt-auto">
+  <footer className="border-t border-[#00f3ff]/20 bg-[#020b12] py-8 px-6 mt-auto relative z-10">
     <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
       <div className="flex items-center gap-2">
         <Cpu className="w-4 h-4 text-[#00f3ff]" />
@@ -408,23 +553,53 @@ const Footer = () => (
   </footer>
 );
 
+// --- APP CONTENT WITH ANIMATIONS --- //
+const AppContent = () => {
+  const location = useLocation();
+  const[hasBooted, setHasBooted] = useState(false);
+
+  return (
+    <div className="min-h-screen flex flex-col font-sans selection:bg-[#00f3ff]/30 text-slate-200 overflow-x-hidden relative">
+      <AnimatePresence>
+        {!hasBooted && <BootSequence key="boot" onComplete={() => setHasBooted(true)} />}
+      </AnimatePresence>
+
+      <GridBackground />
+      <ScrollToTop />
+      <Navbar />
+      
+      <main className="relative pt-16 flex-grow">
+        <AnimatePresence mode="wait">
+          {hasBooted && (
+            <motion.div
+              key={location.pathname}
+              initial={{ opacity: 0, scale: 0.98, filter: "brightness(2) blur(5px)" }}
+              animate={{ opacity: 1, scale: 1, filter: "brightness(1) blur(0px)" }}
+              exit={{ opacity: 0, scale: 1.02, filter: "brightness(2) blur(5px)" }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
+              className="w-full h-full"
+            >
+              <Routes location={location}>
+                <Route path="/" element={<AboutPage />} />
+                <Route path="/experience" element={<ExperiencePage />} />
+                <Route path="/projects" element={<ProjectsPage />} />
+                <Route path="/skills" element={<SkillsPage />} />
+                <Route path="*" element={<Navigate to="/" />} />
+              </Routes>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </main>
+      
+      <Footer />
+    </div>
+  );
+};
+
 export default function App() {
   return (
     <Router>
-      <div className="min-h-screen flex flex-col font-sans selection:bg-[#00f3ff]/30 text-slate-200">
-        <GridBackground />
-        <Navbar />
-        <main className="relative pt-16 flex-grow">
-          <Routes>
-            <Route path="/" element={<AboutPage />} />
-            <Route path="/experience" element={<ExperiencePage />} />
-            <Route path="/projects" element={<ProjectsPage />} />
-            <Route path="/skills" element={<SkillsPage />} />
-            <Route path="*" element={<Navigate to="/" />} />
-          </Routes>
-        </main>
-        <Footer />
-      </div>
+      <AppContent />
     </Router>
   );
 }

@@ -133,10 +133,10 @@ export const SKILLS: SkillGroup[] =[
   },
   {
     category: "Frameworks & Tools",
-    skills:["ROS2", "PyTorch", "OpenCV", "Git", "Linux", "React", "Gazebo", "Firebase", "Raspberry Pi"]
+    skills:["ROS2", "Pandas", "PyTorch", "NumPy", "OpenCV", "Git", "Linux", "React", "Gazebo", "Firebase", "Raspberry Pi"]
   },
   {
     category: "Developer Skills",
-    skills:["Data Structures", "Algorithms", "Agile/SCRUM", "Object-Oriented Programming and Design", "Unit Testing", "GenAI Prompting"]
+    skills:["Data Structures", "Algorithms", "App/Web Development", "Agile/SCRUM", "Object-Oriented Programming and Design", "Unit Testing", "GenAI Prompting"]
   }
 ];
