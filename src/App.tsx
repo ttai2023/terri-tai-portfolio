@@ -22,16 +22,16 @@ const GridBackground = () => (
   />
 );
 
-// 2. The custom Sci-Fi HUD box matching the screenshot's borders
+// 2. The custom Sci-Fi HUD box matching the screenshot's borders (NOW WITH HOVER ANIMATIONS!)
 const SciFiPanel: React.FC<{ children: ReactNode; className?: string }> = ({ children, className = '' }) => (
-  <div className={`relative bg-[#021b2b]/80 border border-[#00f3ff]/40 p-8 shadow-[0_0_15px_rgba(0,243,255,0.15)] backdrop-blur-sm group ${className}`}>
+  <div className={`relative bg-[#021b2b]/70 border border-[#00f3ff]/40 p-8 shadow-[0_0_15px_rgba(0,243,255,0.15)] backdrop-blur-sm group transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1 hover:bg-[#021b2b]/95 hover:border-[#00f3ff]/80 hover:shadow-[0_0_30px_rgba(0,243,255,0.4)] z-0 hover:z-10 ${className}`}>
     {/* Decorative HUD Corners */}
-    <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-[#00f3ff] transition-all group-hover:scale-110" />
-    <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-[#00f3ff] transition-all group-hover:scale-110" />
-    <div className="absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2 border-[#00f3ff] transition-all group-hover:scale-110" />
-    <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-[#00f3ff] transition-all group-hover:scale-110" />
+    <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-[#00f3ff] transition-all group-hover:scale-125 group-hover:border-[#00f3ff]" />
+    <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-[#00f3ff] transition-all group-hover:scale-125 group-hover:border-[#00f3ff]" />
+    <div className="absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2 border-[#00f3ff] transition-all group-hover:scale-125 group-hover:border-[#00f3ff]" />
+    <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-[#00f3ff] transition-all group-hover:scale-125 group-hover:border-[#00f3ff]" />
     {/* Subtle inner grid glow */}
-    <div className="absolute inset-0 bg-gradient-to-b from-[#00f3ff]/5 to-transparent pointer-events-none" />
+    <div className="absolute inset-0 bg-gradient-to-b from-[#00f3ff]/5 to-transparent pointer-events-none transition-opacity group-hover:opacity-50" />
     <div className="relative z-10">{children}</div>
   </div>
 );
@@ -149,19 +149,17 @@ const TerminalTypingEffect = () => {
   }
 
   return (
-    <h1 className="text-5xl md:text-7xl font-black tracking-tighter text-white mb-6 uppercase min-h-[1.5em] flex items-center justify-center flex-wrap">
-      <span>
-        {firstString}
-        <span className="text-[#00f3ff]" style={{ textShadow: '0 0 20px #00f3ff' }}>{highlightString}</span>
-        {endString}
-      </span>
+    // Replaced flex wrapping with standard text-center so the cursor stays anchored to the text
+    <h1 className="text-5xl md:text-7xl font-black tracking-tighter text-white mb-6 uppercase min-h-[1.5em] text-center">
+      {firstString}
+      <span className="text-[#00f3ff]" style={{ textShadow: '0 0 20px #00f3ff' }}>{highlightString}</span>
+      {endString}
       {/* Blinking Block Cursor */}
       <motion.span
         initial={{ opacity: 0 }}
         animate={{ opacity:[1, 0, 1] }}
         transition={{ repeat: Infinity, duration: 0.8, ease: "linear" }}
-        className="inline-block w-[0.4em] h-[0.9em] bg-[#00f3ff] ml-2 shadow-[0_0_10px_#00f3ff]"
-        style={{ marginBottom: '-0.1em' }}
+        className="inline-block w-[0.4em] h-[0.9em] bg-[#00f3ff] ml-1 shadow-[0_0_10px_#00f3ff] align-baseline"
       />
     </h1>
   );
