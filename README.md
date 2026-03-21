@@ -1,5 +1,6 @@
 # TERRI TAI // COMPUTER ENGINEER
 
+> Autonomous Systems · Robotics · AI · Full-Stack
 > Designing intelligent systems for autonomy, perception, and real-world impact.
 
 ---
