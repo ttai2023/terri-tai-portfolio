@@ -106,6 +106,17 @@ export const EXPERIENCES: Experience[] =[
     ]
   },
   {
+    company: "Yonder Deep",
+    role: "Software Team Member",
+    period: "Oct 2023 - Oct 2024",
+    location: "La Jolla, CA",
+    description:[
+      "Developed software for an Autonomous Underwater Vehicle (AUV) dedicated to oceanography and climate research.",
+      "Implemented depth map stereo vision and underwater computer vision algorithms using Python and OpenCV to enhance object detection.",
+      "Analyzed IMU data and implemented a PID controller, successfully improving the AUV's directional accuracy by 10%."
+    ]
+  },
+  {
     company: "Existential Robotics Lab (ERL)",
     role: "Undergraduate Researcher",
     period: "Jun 2025 - Aug 2025",

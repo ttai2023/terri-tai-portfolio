@@ -137,38 +137,64 @@ const GridBackground = () => {
 
 const SystemLogs = ({ showUnlocked }: { showUnlocked: boolean }) => {
   const [logs, setLogs] = useState<{msg: string, time: string}[]>([]);
-  const logMessages = [
-    "FETCHING EXP_LOGS...",
-    "BYPASSING FIREWALL...",
-    "DECRYPTING CLEARANCES...",
-    "AWAITING USER DECRYPTION...",
-  ];
 
+  // shows system logs
   useEffect(() => {
+    const timestamp = new Date().toISOString().split('T')[1].slice(0, -1);
+
+    // decrypted before -> show full logs immediately
+    if (showUnlocked) {
+      setLogs([
+        { msg: "FETCHING EXP_LOGS...", time: timestamp },
+        { msg: "BYPASSING FIREWALL...", time: timestamp },
+        { msg: "DECRYPTING CLEARANCES...", time: timestamp },
+        { msg: "LOGS UNLOCKED.", time: timestamp }
+      ]);
+      return; // Exit the useEffect so the interval never starts
+    }
+
+    // first time decrypting -> play animation
+    const initialMessages =[
+      "FETCHING EXP_LOGS...",
+      "BYPASSING FIREWALL...",
+      "DECRYPTING CLEARANCES...",
+      "AWAITING USER DECRYPTION..."
+    ];
+
     let currentIndex = 0;
     const interval = setInterval(() => {
-      if (currentIndex < logMessages.length) {
-        const timestamp = new Date().toISOString().split('T')[1].slice(0, -1);
-        setLogs(prev => [...prev, { msg: logMessages[currentIndex], time: timestamp }]);
+      if (currentIndex < initialMessages.length) {
+        const currentTimestamp = new Date().toISOString().split('T')[1].slice(0, -1);
+        setLogs(prev => [...prev, { msg: initialMessages[currentIndex], time: currentTimestamp }]);
         currentIndex++;
       } else {
         clearInterval(interval);
       }
     }, 400);
-    return () => clearInterval(interval);
-  }, []);
 
-  const displayLogs = showUnlocked && logs.length === logMessages.length
-    ? [...logs.slice(0, -1), { msg: "LOGS UNLOCKED.", time: logs[logs.length - 1]?.time ?? "" }]
-    : logs;
+    return () => clearInterval(interval);
+  },[]); 
+
+  // listen for decrypt 
+  useEffect(() => {
+    if (showUnlocked) {
+      setLogs(prev => {
+        if (prev.length === 0) return prev;
+        const newLogs = [...prev];
+        newLogs[newLogs.length - 1].msg = "LOGS UNLOCKED.";
+        return newLogs;
+      });
+    }
+  }, [showUnlocked]);
 
   return (
     <div className="font-mono text-[#00f3ff] text-xs md:text-sm mb-12 bg-[#00f3ff]/5 p-4 border border-[#00f3ff]/20 rounded h-40 flex flex-col justify-end relative overflow-hidden shadow-[inset_0_0_20px_rgba(0,243,255,0.05)]">
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#00f3ff]/30 to-transparent animate-[shimmer_2s_infinite]" />
-      {displayLogs.map((log, i) => (
+      
+      {logs.map((log, i) => (
         <motion.div
-          key={log.msg}
-          initial={{ opacity: 0, x: -10 }}
+          key={i}
+          initial={showUnlocked ? false : { opacity: 0, x: -10 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.3 }}
           className="flex gap-3 mb-1"
