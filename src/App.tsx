@@ -574,6 +574,7 @@ const AboutPage: React.FC<{ soundEnabled: boolean }> = ({ soundEnabled }) => (
             <p className="flex items-start gap-2"><span className="text-slate-500">|-</span> Technical Development: Projects @ WIC UCSD.</p>
             <p className="flex items-start gap-2"><span className="text-slate-500">|-</span> Hard Hack Director @ HKN UCSD.</p>
           </div>
+          <p>&gt; Status: Open to Internships 2026</p>
         </motion.div>
 
         <motion.div 
