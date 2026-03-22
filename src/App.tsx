@@ -335,7 +335,7 @@ const AboutPage: React.FC<{ soundEnabled: boolean }> = ({ soundEnabled }) => (
         >
           <p>&gt; Subject: Terri Yu Chen Tai.</p>
           <p>&gt; Specialization: Autonomous Systems, Robotics & AI.</p>
-          <p>&gt; Current Directive:</p>
+          <p>&gt; Current Missions:</p>
           <div className="pl-6 md:pl-10 ml-2 mt-2 space-y-2 border-l border-[#00f3ff]/40 text-[#00f3ff]">
             <p className="flex items-start gap-2"><span className="text-slate-500">|-</span> CSE Tutor @ CSE Department UCSD.</p>
             <p className="flex items-start gap-2"><span className="text-slate-500">|-</span> ELC Tutor @ Jacobs School of Engineering UCSD.</p>
