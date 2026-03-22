@@ -3,14 +3,16 @@ import { Project, Experience, SkillGroup } from './types';
 export const PROJECTS: Project[] =[
   {
     title: "Brain Tumor Segmentation",
-    description: "Implemented a 2D U-Net CNN from scratch in PyTorch for automated segmentation on 4-channel multimodal MRI scans. Engineered a custom Dice Loss function to mitigate class imbalance.",
-    tags:["Python", "PyTorch", "Computer Vision", "U-Net"],
+    description: "Implemented a 2D U-Net CNN from scratch in PyTorch for automated segmentation on 4-channel multimodal MRI scans.",
+    details: "Built entirely from scratch using PyTorch, this model addresses the heavy class imbalance between healthy tissue and tumor boundaries by implementing a custom Dice Loss function. Evaluated against the BraTS dataset, it successfully localizes heterogeneous tumor structures to assist in diagnostic accuracy.",
+    tags: ["Python", "PyTorch", "Computer Vision", "U-Net"],
     date: "Jan 2024 - Mar 2024",
     link: "https://github.com/ttai2023/emmywei-territai-ece176-finalproject"
   },
   {
     title: "WayNo Smart Parallel Parking Robot",
-    description: "Designed a real-time parallel parking algorithm leveraging sensor fusion and path planning in ROS2. Achieved >95% accuracy in designated spaces.",
+    description: "Designed a real-time parallel parking algorithm leveraging sensor fusion and path planning in ROS2.",
+    details: "Utilized a combination of HSV color masking, contour detection, and sensor data to allow a multi-agent robotic system to autonomously navigate and park. Achieved >95% accuracy in simulated Gazebo environments and physical testing.",
     tags:["Python", "ROS2", "OpenCV", "Robotics"],
     date: "Sep 2025 - Dec 2025",
     link: "https://github.com/UCSD-ECEMAE-148/fall-final-project-team-9"
@@ -18,26 +20,30 @@ export const PROJECTS: Project[] =[
   {
     title: "Professor Card Collector App",
     description: "Collaborated to build a card collector web app for UCSD professors in a team of 12. Voted best project in class.",
+    details: "Acted in an Agile/SCRUM environment to map out UI/UX and database schemas. Allowed students to 'collect' trading cards of their favorite UCSD professors. Managed sprint planning, code reviews, and deployments.",
     tags:["HTML", "CSS", "Javascript", "Agile/SCRUM"],
     date: "Jan 2025 - Mar 2025",
     link: "https://github.com/cse110-sp25-group30/cse110-sp25-group30"
   },
   {
     title: "Text To Tracks Web App",
-    description: "Collaborated to create a web app that transforms articles into TikTok-style videos with subtitles. Won Honorable Mention at DiamondHacks 2024.",
+    description: "Collaborated to create a web app that transforms articles into TikTok-style videos with subtitles.",
+    details: "Built in 48 hours for DiamondHacks 2024 (Honorable Mention). Uses Python web-scraping to ingest scholarly articles and dynamically overlays text onto 'Subway Surfers' gameplay footage to increase Gen-Z viewer retention.",
     tags:["Python", "CSS", "Hackathon"],
     date: "2024",
     link: "https://github.com/danielbonkowsky/subwaysurfers-text"
   },
   {
     title: "EQ Glasses",
-    description: "Constructed a facial recognition algorithm using OpenCV to identify targets and assist in emotion recognition for relationship interactions.",
+    description: "Constructed a facial recognition algorithm using OpenCV to identify targets and assist in emotion recognition.",
+    details: "Leveraged pre-trained cascade classifiers and customized facial mapping algorithms to identify user emotions in real-time, aiming to assist neurodivergent individuals in navigating relationship interactions.",
     tags:["Python", "OpenCV", "AI"],
     date: "2024",
     link: "https://github.com/marcokrause7/EQ-Glasses"
   }
 ];
 
+// ... (Keep the rest of your EXPERIENCES and SKILLS exactly the same below this!)
 export const EXPERIENCES: Experience[] =[
   {
     company: "Jacobs School of Engineering at UCSD",
@@ -51,7 +57,7 @@ export const EXPERIENCES: Experience[] =[
   },
   {
     company: "Women in Computing (WIC) at UCSD",
-    role: "Technical Development: Projects Chair",
+    role: "Tech Dev Projects Chair",
     period: "Sep 2025 - Present",
     location: "La Jolla, CA",
     description:[
@@ -104,7 +110,7 @@ export const EXPERIENCES: Experience[] =[
   },
   {
     company: "UCSD Triton Research - Lo Lab",
-    role: "Undergraduate Researcher",
+    role: "Research Assistant",
     period: "Jun 2024 - Aug 2024",
     location: "San Diego, CA",
     description:[
@@ -116,7 +122,7 @@ export const EXPERIENCES: Experience[] =[
   },
   {
     company: "Caltech VURP Program",
-    role: "Visiting Undergraduate Researcher",
+    role: "Researcher",
     period: "Jun 2023 - Aug 2023",
     location: "Pasadena, CA",
     description:[
@@ -129,14 +135,14 @@ export const EXPERIENCES: Experience[] =[
 export const SKILLS: SkillGroup[] =[
   {
     category: "Languages",
-    skills:["Java", "Python", "C/C++", "Go", "JavaScript", "HTML/CSS", "Swift", "XML", "ARM32 Assembly"]
+    skills:["Java", "Python", "C/C++", "Go", "HTML/CSS", "JavaScript", "Swift", "XML", "ARM32 Assembly"]
   },
   {
     category: "Frameworks & Tools",
-    skills:["ROS2", "Pandas", "PyTorch", "NumPy", "OpenCV", "Git", "Linux", "React", "Gazebo", "Firebase", "Raspberry Pi"]
+    skills:["ROS2", "PyTorch", "OpenCV", "Git", "Linux", "Gazebo", "Firebase", "VSCode", "IntelliJ", "MATLAB", "Raspberry Pi"]
   },
   {
     category: "Developer Skills",
-    skills:["Data Structures", "Algorithms", "App/Web Development", "Agile/SCRUM", "Object-Oriented Programming and Design", "Unit Testing", "GenAI Prompting"]
+    skills:["Data Structures", "Algorithms", "Agile/SCRUM", "OOD", "Unit Testing", "App/Web Development", "GenAI Prompting"]
   }
 ];

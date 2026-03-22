@@ -4,47 +4,67 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Cpu, Github, Linkedin, Mail, ExternalLink, Code2, Brain, Rocket, Target, Microscope, Volume2, VolumeX } from 'lucide-react';
 import { PROJECTS, EXPERIENCES, SKILLS } from './constants';
 
-// --- SYNTHESIZED HUD AUDIO --- //
-// Generates a digital sound dynamically 
+// --- SYNTHESIZED AUDIO ENGINES --- //
+
+let audioCtx: AudioContext | null = null;
+const getAudioContext = () => {
+  if (!audioCtx) {
+    const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+    if (AudioContextClass) audioCtx = new AudioContextClass();
+  }
+  return audioCtx;
+};
+
 const playHUDTransitionSound = () => {
   try {
-    const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
-    if (!AudioContext) return;
-    
-    const ctx = new AudioContext();
+    const ctx = getAudioContext();
+    if (!ctx) return;
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
-    
     osc.connect(gain);
     gain.connect(ctx.destination);
-    
-    // Sci-fi UI tone (starts high, drops fast)
     osc.type = "sine";
     osc.frequency.setValueAtTime(1200, ctx.currentTime);
     osc.frequency.exponentialRampToValueAtTime(300, ctx.currentTime + 0.15);
-    
-    // Volume envelope (quiet, quick fade out)
-    gain.gain.setValueAtTime(0.02, ctx.currentTime); 
+    gain.gain.setValueAtTime(0.02, ctx.currentTime);
     gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
-    
     osc.start(ctx.currentTime);
     osc.stop(ctx.currentTime + 0.15);
-  } catch (e) {
-    console.log("Audio playback failed", e);
-  }
+  } catch (e) {}
 };
+
+const playTypingSound = () => {
+  try {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = "square";
+    osc.frequency.setValueAtTime(600 + Math.random() * 200, ctx.currentTime); // Random pitch for mechanical sound
+    gain.gain.setValueAtTime(0.008, ctx.currentTime); // Very faint
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.02);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.02);
+  } catch (e) {}
+};
+
+// --- GLOBAL STATES --- //
+let globalLogsDecrypted = false;
 
 // --- HUD THEME COMPONENTS --- //
 
 const BootSequence: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
-  const [text, setText] = useState<string[]>([]);
+  const[text, setText] = useState<string[]>([]);
+  // Personal Boot System
   const sequence =[
-    "KERNEL BOOT SEQUENCE INITIATED...",
-    "LOADING CORE MODULES...",
-    "MOUNTING VIRTUAL FILE SYSTEMS...",
-    "ESTABLISHING SECURE UPLINK...",
-    "DECRYPTING ADMIN PROFILE...",
-    "ACCESS GRANTED."
+    "INITIATING T.TAI_OS v8.31...",
+    "LOADING ALL_NIGHTER_SEQUENCE...",
+    "COMPILING HACKATHON_PROTOCOLS...",
+    "BYPASSING TUTORING_BREAK...",
+    "DECRYPTING ENGINEERING_LOGS...",
+    "WELCOME TO MY PAGE - TERRI."
   ];
 
   useEffect(() => {
@@ -78,72 +98,61 @@ const BootSequence: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
-
-  useEffect(() => {
-    window.scrollTo({
-      top: 0,
-      behavior: "instant", 
-    });
-  },[pathname]);
-
+  useEffect(() => { window.scrollTo({ top: 0, behavior: "instant" }); },[pathname]);
   return null;
 };
 
-// ✨ UPGRADED: Grid now has a pulsing, breathing background glow
 const GridBackground = () => {
   const[mousePos, setMousePos] = useState({ x: 0, y: 0 });
-
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       const x = (e.clientX / window.innerWidth - 0.5) * 20; 
       const y = (e.clientY / window.innerHeight - 0.5) * 20;
       setMousePos({ x, y });
     };
-
     window.addEventListener("mousemove", handleMouseMove);
     return () => window.removeEventListener("mousemove", handleMouseMove);
   },[]);
 
   return (
     <>
-      {/* 1. The moving grid layer */}
       <div 
         className="fixed inset-0 pointer-events-none z-[-2] transition-transform duration-700 ease-out"
         style={{
           backgroundColor: '#03101c',
-          backgroundImage: `
-            linear-gradient(rgba(0, 243, 255, 0.1) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(0, 243, 255, 0.1) 1px, transparent 1px)
-          `,
+          backgroundImage: `linear-gradient(rgba(0, 243, 255, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 243, 255, 0.1) 1px, transparent 1px)`,
           backgroundSize: '40px 40px',
           transform: `translate(${mousePos.x}px, ${mousePos.y}px) scale(1.05)` 
         }}
       />
-      {/* 2. The new breathing pulse layer */}
       <motion.div
         animate={{ opacity:[0.3, 0.6, 0.3] }}
         transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
         className="fixed inset-0 pointer-events-none z-[-1]"
-        style={{
-          background: 'radial-gradient(circle at center, rgba(0, 243, 255, 0.08) 0%, transparent 70%)'
-        }}
+        style={{ background: 'radial-gradient(circle at center, rgba(0, 243, 255, 0.08) 0%, transparent 70%)' }}
       />
     </>
   );
 };
 
+// ✨ UPGRADED: Logs now only play once per session
 const SystemLogs = () => {
   const [logs, setLogs] = useState<{msg: string, time: string}[]>([]);
-  
   const logMessages =[
-    "INITIALIZING EXP_LOGS...",
-    "ESTABLISHING SECURE CONNECTION...",
-    "DECRYPTING PREVIOUS ROLES...",
-    "LOADING RESEARCH DATA...",
-    "ACCESS GRANTED."
+    "FETCHING EXP_LOGS...",
+    "BYPASSING FIREWALL...",
+    "DECRYPTING CLEARANCES...",
+    "LOGS UNLOCKED."
   ];
   
   useEffect(() => {
+    // If we already decrypted this session, show logs instantly!
+    if (globalLogsDecrypted) {
+      const timestamp = new Date().toISOString().split('T')[1].slice(0,-1);
+      setLogs(logMessages.map(msg => ({ msg, time: timestamp })));
+      return;
+    }
+
     let currentIndex = 0;
     const interval = setInterval(() => {
       if (currentIndex < logMessages.length) {
@@ -152,6 +161,7 @@ const SystemLogs = () => {
         currentIndex++;
       } else {
         clearInterval(interval);
+        globalLogsDecrypted = true; 
       }
     }, 400); 
     
@@ -161,18 +171,10 @@ const SystemLogs = () => {
   return (
     <div className="font-mono text-[#00f3ff] text-xs md:text-sm mb-12 bg-[#00f3ff]/5 p-4 border border-[#00f3ff]/20 rounded h-40 flex flex-col justify-end relative overflow-hidden shadow-[inset_0_0_20px_rgba(0,243,255,0.05)]">
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#00f3ff]/30 to-transparent animate-[shimmer_2s_infinite]" />
-      
       {logs.map((log, i) => (
-        <motion.div 
-          key={i} 
-          initial={{ opacity: 0, x: -10 }}
-          animate={{ opacity: 1, x: 0 }}
-          className="flex gap-3 mb-1"
-        >
+        <motion.div key={i} initial={globalLogsDecrypted ? false : { opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="flex gap-3 mb-1">
           <span className="text-slate-500 opacity-70">[{log.time}]</span>
-          <span className={i === logMessages.length - 1 ? "text-green-400 font-bold" : ""}>
-            {log.msg}
-          </span>
+          <span className={i === logMessages.length - 1 ? "text-green-400 font-bold" : ""}>{log.msg}</span>
         </motion.div>
       ))}
       <div className="w-2 h-4 bg-[#00f3ff] mt-1 animate-pulse" />
@@ -208,11 +210,8 @@ const SectionHeading: React.FC<{ children: ReactNode; icon: any }> = ({ children
   </div>
 );
 
-// --- MAIN PORTFOLIO SECTIONS --- //
-
 const Navbar: React.FC<{ soundEnabled: boolean, toggleSound: () => void }> = ({ soundEnabled, toggleSound }) => {
   const location = useLocation();
-  
   const navLinks =[
     { name: 'SYSTEM_STATUS (ABOUT)', path: '/' },
     { name: 'EXP_LOGS', path: '/experience' },
@@ -234,58 +233,39 @@ const Navbar: React.FC<{ soundEnabled: boolean, toggleSound: () => void }> = ({ 
         </Link>
         <div className="hidden lg:flex items-center gap-8 text-xs font-mono tracking-widest text-[#00f3ff]/60">
           {navLinks.map((link) => (
-            <Link 
-              key={link.name} 
-              to={link.path} 
-              className={`transition-all duration-300 hover:text-[#00f3ff] hover:drop-shadow-[0_0_8px_#00f3ff] ${
-                location.pathname === link.path ? 'text-[#00f3ff] border-b border-[#00f3ff] pb-1' : ''
-              }`}
-            >[{link.name}]
+            <Link key={link.name} to={link.path} className={`transition-all duration-300 hover:text-[#00f3ff] hover:drop-shadow-[0_0_8px_#00f3ff] ${location.pathname === link.path ? 'text-[#00f3ff] border-b border-[#00f3ff] pb-1' : ''}`}>
+              [{link.name}]
             </Link>
           ))}
         </div>
         <div className="flex items-center gap-2 md:gap-4 text-[#00f3ff]">
-          
-          {/* ✨ SOUND TOGGLE BUTTON */}
-          <button 
-            onClick={toggleSound}
-            className="flex items-center gap-2 px-2 py-1 md:px-3 md:py-2 hover:bg-[#00f3ff]/10 rounded border border-transparent hover:border-[#00f3ff]/50 transition-all text-xs font-mono mr-2"
-            title="Toggle HUD Sounds"
-          >
+          <button onClick={toggleSound} className="flex items-center gap-2 px-2 py-1 md:px-3 md:py-2 hover:bg-[#00f3ff]/10 rounded border border-transparent hover:border-[#00f3ff]/50 transition-all text-xs font-mono mr-2" title="Toggle HUD Sounds">
             {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4 opacity-50" />}
-            <span className="hidden sm:inline opacity-70">
-              SND:{soundEnabled ? 'ON' : 'OFF'}
-            </span>
+            <span className="hidden sm:inline opacity-70">SND:{soundEnabled ? 'ON' : 'OFF'}</span>
           </button>
           <div className="w-px h-6 bg-[#00f3ff]/30 mr-2" />
-
-          <a href="mailto:y2tai@ucsd.edu" className="p-2 hover:bg-[#00f3ff]/10 rounded border border-transparent hover:border-[#00f3ff]/50 transition-all">
-            <Mail className="w-4 h-4 md:w-5 md:h-5" />
-          </a>
-          <a href="https://github.com/ttai2023" target="_blank" rel="noreferrer" className="p-2 hover:bg-[#00f3ff]/10 rounded border border-transparent hover:border-[#00f3ff]/50 transition-all">
-            <Github className="w-4 h-4 md:w-5 md:h-5" />
-          </a>
-          <a href="https://linkedin.com/in/terri-tai-732a21229" target="_blank" rel="noreferrer" className="p-2 hover:bg-[#00f3ff]/10 rounded border border-transparent hover:border-[#00f3ff]/50 transition-all">
-            <Linkedin className="w-4 h-4 md:w-5 md:h-5" />
-          </a>
+          <a href="mailto:y2tai@ucsd.edu" className="p-2 hover:bg-[#00f3ff]/10 rounded border border-transparent hover:border-[#00f3ff]/50 transition-all"><Mail className="w-4 h-4 md:w-5 md:h-5" /></a>
+          <a href="https://github.com/ttai2023" target="_blank" rel="noreferrer" className="p-2 hover:bg-[#00f3ff]/10 rounded border border-transparent hover:border-[#00f3ff]/50 transition-all"><Github className="w-4 h-4 md:w-5 md:h-5" /></a>
+          <a href="https://linkedin.com/in/terri-tai-732a21229" target="_blank" rel="noreferrer" className="p-2 hover:bg-[#00f3ff]/10 rounded border border-transparent hover:border-[#00f3ff]/50 transition-all"><Linkedin className="w-4 h-4 md:w-5 md:h-5" /></a>
         </div>
       </div>
     </nav>
   );
 };
 
-const TerminalTypingEffect = () => {
+// ✨ UPGRADED: Added typing sound integration
+const TerminalTypingEffect: React.FC<{ soundEnabled: boolean }> = ({ soundEnabled }) => {
   const[displayedText, setDisplayedText] = useState("");
   const fullText = "BUILDING FUTURE SYSTEMS...";
 
   useEffect(() => {
     let index = 0;
     const typingSpeed = 80;
-
     const delayStart = setTimeout(() => {
       const intervalId = setInterval(() => {
         if (index <= fullText.length) {
           setDisplayedText(fullText.slice(0, index));
+          if (soundEnabled && index < fullText.length) playTypingSound(); // Play sound!
           index++;
         } else {
           clearInterval(intervalId);
@@ -293,16 +273,12 @@ const TerminalTypingEffect = () => {
       }, typingSpeed);
       return () => clearInterval(intervalId);
     }, 800);
-
     return () => clearTimeout(delayStart);
-  },[]);
+  },[soundEnabled]);
 
   const part1 = "BUILDING ";
   const part2 = "FUTURE";
-  
-  let firstString = "";
-  let highlightString = "";
-  let endString = "";
+  let firstString = "", highlightString = "", endString = "";
 
   if (displayedText.length <= part1.length) {
     firstString = displayedText;
@@ -330,14 +306,13 @@ const TerminalTypingEffect = () => {
   );
 };
 
-
-const AboutPage = () => (
+const AboutPage: React.FC<{ soundEnabled: boolean }> = ({ soundEnabled }) => (
   <section className="min-h-screen flex flex-col items-center justify-center px-6 py-12 md:py-12 relative">
     <motion.div 
       initial={{ opacity: 0, y: 40 }} 
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, ease:[0.22, 1, 0.36, 1], delay: 0.2 }}
-      className="w-full max-w-4xl my-12" 
+      className="w-full max-w-4xl my-12"
     >
       <SciFiPanel className="text-center py-20">
         <motion.div 
@@ -350,7 +325,7 @@ const AboutPage = () => (
           COMPUTER_ENGINEER // UCSD_2027
         </motion.div>
         
-        <TerminalTypingEffect />
+        <TerminalTypingEffect soundEnabled={soundEnabled} />
         
         <motion.div 
           initial={{ opacity: 0 }}
@@ -360,24 +335,12 @@ const AboutPage = () => (
         >
           <p>&gt; Subject: Terri Yu Chen Tai.</p>
           <p>&gt; Specialization: Autonomous Systems, Robotics & AI.</p>
-          <p>&gt; Current Directives:</p>
+          <p>&gt; Current Directive:</p>
           <div className="pl-6 md:pl-10 ml-2 mt-2 space-y-2 border-l border-[#00f3ff]/40 text-[#00f3ff]">
-            <p className="flex items-start gap-2">
-              <span className="text-slate-500">|-</span> 
-              CSE Tutor @ CSE Department UCSD.
-            </p>
-            <p className="flex items-start gap-2">
-              <span className="text-slate-500">|-</span> 
-              ELC Tutor @ Jacobs School of Engineering UCSD.
-            </p>
-            <p className="flex items-start gap-2">
-              <span className="text-slate-500">|-</span> 
-              Technical Development: Projects @ WIC UCSD.
-            </p>
-            <p className="flex items-start gap-2">
-              <span className="text-slate-500">|-</span> 
-              Hard Hack Director @ HKN UCSD.
-            </p>
+            <p className="flex items-start gap-2"><span className="text-slate-500">|-</span> CSE Tutor @ CSE Department UCSD.</p>
+            <p className="flex items-start gap-2"><span className="text-slate-500">|-</span> ELC Tutor @ Jacobs School of Engineering UCSD.</p>
+            <p className="flex items-start gap-2"><span className="text-slate-500">|-</span> Technical Development: Projects @ WIC UCSD.</p>
+            <p className="flex items-start gap-2"><span className="text-slate-500">|-</span> Hard Hack Director @ HKN UCSD.</p>
           </div>
         </motion.div>
 
@@ -401,44 +364,22 @@ const AboutPage = () => (
 );
 
 const ExperiencePage = () => {
-  const researchLogs = EXPERIENCES.filter(exp => 
-    exp.role.toLowerCase().includes('research') || 
-    exp.company.toLowerCase().includes('lab')
-  );
-  
-  const techExperiences = EXPERIENCES.filter(exp => 
-    !exp.role.toLowerCase().includes('research') && 
-    !exp.company.toLowerCase().includes('lab')
-  );
+  const researchLogs = EXPERIENCES.filter(exp => exp.role.toLowerCase().includes('research') || exp.company.toLowerCase().includes('lab'));
+  const techExperiences = EXPERIENCES.filter(exp => !exp.role.toLowerCase().includes('research') && !exp.company.toLowerCase().includes('lab'));
 
   return (
     <section className="max-w-7xl mx-auto px-6 py-24 min-h-screen">
-      
       <SystemLogs />
-
       <div className="mb-24">
         <SectionHeading icon={Rocket}>Technical Experience</SectionHeading>
         <div className="space-y-8">
           {techExperiences.map((exp, idx) => (
-            <motion.div 
-              key={`tech-${idx}`}
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }} 
-              transition={{ 
-                duration: 0.7, 
-                delay: idx * 0.1,
-                ease:[0.22, 1, 0.36, 1] 
-              }}
-            >
+            <motion.div key={`tech-${idx}`} initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.7, delay: idx * 0.1, ease:[0.22, 1, 0.36, 1] }}>
               <SciFiPanel>
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 border-b border-[#00f3ff]/20 pb-4">
                   <div>
                     <h3 className="text-2xl font-bold text-white tracking-wide">{exp.role}</h3>
-                    <p className="text-[#00f3ff] font-mono mt-1 flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 bg-[#00f3ff] rounded-full animate-pulse" />
-                      {exp.company}
-                    </p>
+                    <p className="text-[#00f3ff] font-mono mt-1 flex items-center gap-2"><span className="w-1.5 h-1.5 bg-[#00f3ff] rounded-full animate-pulse" />{exp.company}</p>
                   </div>
                   <div className="text-left md:text-right font-mono text-sm">
                     <p className="text-[#00f3ff]/80">[{exp.period}]</p>
@@ -447,10 +388,7 @@ const ExperiencePage = () => {
                 </div>
                 <ul className="space-y-3">
                   {exp.description.map((item, i) => (
-                    <li key={i} className="flex gap-3 text-[#8ab4f8] font-mono text-sm leading-relaxed">
-                      <span className="text-[#00f3ff] mt-0.5">&gt;</span>
-                      <span>{item}</span>
-                    </li>
+                    <li key={i} className="flex gap-3 text-[#8ab4f8] font-mono text-sm leading-relaxed"><span className="text-[#00f3ff] mt-0.5">&gt;</span><span>{item}</span></li>
                   ))}
                 </ul>
               </SciFiPanel>
@@ -463,25 +401,12 @@ const ExperiencePage = () => {
         <SectionHeading icon={Microscope}>Research Logs</SectionHeading>
         <div className="space-y-8">
           {researchLogs.map((exp, idx) => (
-            <motion.div 
-              key={`research-${idx}`}
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ 
-                duration: 0.7, 
-                delay: idx * 0.1,
-                ease:[0.22, 1, 0.36, 1]
-              }}
-            >
+            <motion.div key={`research-${idx}`} initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.7, delay: idx * 0.1, ease:[0.22, 1, 0.36, 1] }}>
               <SciFiPanel>
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 border-b border-[#00f3ff]/20 pb-4">
                   <div>
                     <h3 className="text-2xl font-bold text-white tracking-wide">{exp.role}</h3>
-                    <p className="text-[#00f3ff] font-mono mt-1 flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 bg-[#00f3ff] rounded-full animate-pulse" />
-                      {exp.company}
-                    </p>
+                    <p className="text-[#00f3ff] font-mono mt-1 flex items-center gap-2"><span className="w-1.5 h-1.5 bg-[#00f3ff] rounded-full animate-pulse" />{exp.company}</p>
                   </div>
                   <div className="text-left md:text-right font-mono text-sm">
                     <p className="text-[#00f3ff]/80">[{exp.period}]</p>
@@ -490,10 +415,7 @@ const ExperiencePage = () => {
                 </div>
                 <ul className="space-y-3">
                   {exp.description.map((item, i) => (
-                    <li key={i} className="flex gap-3 text-[#8ab4f8] font-mono text-sm leading-relaxed">
-                      <span className="text-[#00f3ff] mt-0.5">&gt;</span>
-                      <span>{item}</span>
-                    </li>
+                    <li key={i} className="flex gap-3 text-[#8ab4f8] font-mono text-sm leading-relaxed"><span className="text-[#00f3ff] mt-0.5">&gt;</span><span>{item}</span></li>
                   ))}
                 </ul>
               </SciFiPanel>
@@ -505,45 +427,57 @@ const ExperiencePage = () => {
   );
 };
 
+// ✨ UPGRADED: Expandable Project Cards
+const ProjectCard = ({ project }: { project: any }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  return (
+    <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.7, ease:[0.22, 1, 0.36, 1] }} className="h-full">
+      <SciFiPanel className="h-full flex flex-col">
+        <div className="flex items-center justify-between mb-4 border-b border-[#00f3ff]/20 pb-2">
+          <span className="text-xs font-mono text-[#00f3ff]/60">DATE: {project.date}</span>
+          {project.link && (
+            <a href={project.link} target="_blank" rel="noreferrer" className="text-[#00f3ff] hover:text-white transition-colors"><ExternalLink className="w-5 h-5" /></a>
+          )}
+        </div>
+        <h3 className="text-2xl font-bold text-white mb-4 tracking-wide">{project.title}</h3>
+        <p className="text-[#8ab4f8] font-mono text-sm flex-1 leading-relaxed">
+          {project.description}
+        </p>
+        
+        {/* Expandable Details Section */}
+        {project.details && (
+          <div className="mt-4">
+            <button onClick={() => setIsExpanded(!isExpanded)} className="text-[#00f3ff] text-xs font-mono hover:text-white transition-colors flex items-center gap-2">
+              {isExpanded ? "[-] HIDE_ARCHIVE_DATA" : "[+] DECRYPT_FULL_ARCHIVE"}
+            </button>
+            <AnimatePresence>
+              {isExpanded && (
+                <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+                  <div className="pt-4 mt-4 border-t border-[#00f3ff]/20 text-slate-400 text-sm leading-relaxed">
+                    {project.details}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        )}
+
+        <div className="flex flex-wrap gap-2 mt-8">
+          {project.tags.map((tag: string, i: number) => (
+            <span key={i} className="px-2 py-1 bg-[#00f3ff]/10 border border-[#00f3ff]/30 text-[10px] font-mono tracking-widest text-[#00f3ff] uppercase">{tag}</span>
+          ))}
+        </div>
+      </SciFiPanel>
+    </motion.div>
+  );
+};
+
 const ProjectsPage = () => (
   <section className="max-w-7xl mx-auto px-6 py-24 min-h-screen">
     <SectionHeading icon={Code2}>Project Archives</SectionHeading>
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
       {PROJECTS.map((project, idx) => (
-        <motion.div 
-          key={idx}
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ 
-            duration: 0.7, 
-            delay: idx * 0.1,
-            ease:[0.22, 1, 0.36, 1]
-          }}
-          className="h-full"
-        >
-          <SciFiPanel className="h-full flex flex-col">
-            <div className="flex items-center justify-between mb-4 border-b border-[#00f3ff]/20 pb-2">
-              <span className="text-xs font-mono text-[#00f3ff]/60">DATE: {project.date}</span>
-              {project.link && (
-                <a href={project.link} target="_blank" rel="noreferrer" className="text-[#00f3ff] hover:text-white transition-colors">
-                  <ExternalLink className="w-5 h-5" />
-                </a>
-              )}
-            </div>
-            <h3 className="text-2xl font-bold text-white mb-4 tracking-wide">{project.title}</h3>
-            <p className="text-[#8ab4f8] font-mono text-sm mb-8 flex-1 leading-relaxed">
-              {project.description}
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {project.tags.map((tag, i) => (
-                <span key={i} className="px-2 py-1 bg-[#00f3ff]/10 border border-[#00f3ff]/30 text-[10px] font-mono tracking-widest text-[#00f3ff] uppercase">
-                  {tag}
-                </span>
-              ))}
-            </div>
-          </SciFiPanel>
-        </motion.div>
+        <ProjectCard key={idx} project={project} />
       ))}
     </div>
   </section>
@@ -552,25 +486,16 @@ const ProjectsPage = () => (
 const SkillsPage = () => (
   <section className="max-w-7xl mx-auto px-6 py-24 min-h-screen">
     <SectionHeading icon={Brain}>Technical Arsenal Data</SectionHeading>
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
       {SKILLS.map((group, idx) => (
-        <motion.div 
-          key={idx}
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ 
-            duration: 0.7, 
-            delay: idx * 0.1,
-            ease:[0.22, 1, 0.36, 1]
-          }}
-        >
-          <SciFiPanel>
+        <motion.div key={idx} initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.7, delay: idx * 0.1, ease:[0.22, 1, 0.36, 1] }} className="h-full">
+          {/* ✨ UPGRADED: Added h-full and flex flex-col to force alignment */}
+          <SciFiPanel className="h-full flex flex-col">
             <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-3 border-b border-[#00f3ff]/20 pb-4">
               <div className="w-2 h-2 bg-[#00f3ff] shadow-[0_0_8px_#00f3ff]" />
               {group.category}
             </h3>
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-3 mt-auto">
               {group.skills.map((skill, i) => (
                 <div key={i} className="px-3 py-1 border border-[#00f3ff]/30 bg-[#00f3ff]/5 text-xs text-[#8ab4f8] font-mono hover:bg-[#00f3ff]/20 hover:text-white transition-colors cursor-default">
                   {skill}
@@ -589,36 +514,30 @@ const Footer = () => (
     <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
       <div className="flex items-center gap-2">
         <Cpu className="w-4 h-4 text-[#00f3ff]" />
-        <span className="font-mono font-bold tracking-widest text-[#00f3ff] text-sm">T.TAI v8.31</span>
+        <span className="font-mono font-bold tracking-widest text-[#00f3ff] text-sm">T.TAI_OS v8.31</span>
       </div>
-      <p className="text-[#00f3ff]/50 font-mono text-xs">
-        © 2026 TERRI YU CHEN TAI // ALL SYSTEMS OPERATIONAL.
-      </p>
+      <p className="text-[#00f3ff]/50 font-mono text-xs">© 2026 TERRI YU CHEN TAI // ALL SYSTEMS OPERATIONAL...HOPEFULLY.</p>
       <div className="flex items-center gap-6">
-        <a href="mailto:y2tai@ucsd.edu" className="text-[#00f3ff]/70 hover:text-[#00f3ff] hover:shadow-[0_0_10px_#00f3ff] transition-all">
-          <Mail className="w-5 h-5" />
-        </a>
-        <a href="https://github.com/ttai2023" target="_blank" rel="noreferrer" className="text-[#00f3ff]/70 hover:text-[#00f3ff] hover:shadow-[0_0_10px_#00f3ff] transition-all">
-          <Github className="w-5 h-5" />
-        </a>
+        <a href="mailto:y2tai@ucsd.edu" className="text-[#00f3ff]/70 hover:text-[#00f3ff] hover:shadow-[0_0_10px_#00f3ff] transition-all"><Mail className="w-5 h-5" /></a>
+        <a href="https://github.com/ttai2023" target="_blank" rel="noreferrer" className="text-[#00f3ff]/70 hover:text-[#00f3ff] hover:shadow-[0_0_10px_#00f3ff] transition-all"><Github className="w-5 h-5" /></a>
+        <a href="https://linkedin.com/in/terri-tai-732a21229" target="_blank" rel="noreferrer" className="text-[#00f3ff]/70 hover:text-[#00f3ff] hover:shadow-[0_0_10px_#00f3ff] transition-all"><Linkedin className="w-4 h-4 md:w-5 md:h-5" /></a>
       </div>
     </div>
   </footer>
 );
 
-// --- APP CONTENT WITH ANIMATIONS --- //
 const AppContent = () => {
   const location = useLocation();
   const[hasBooted, setHasBooted] = useState(false);
-  
-  // ✨ Global Sound State (Defaulted to OFF for good UX)
   const[soundEnabled, setSoundEnabled] = useState(false);
 
-  // Trigger sound when changing routes!
+  // ✨ FIX 5: Programmatically changing the Document Title
   useEffect(() => {
-    if (hasBooted && soundEnabled) {
-      playHUDTransitionSound();
-    }
+    document.title = "Terri Tai | Portfolio";
+  },[]);
+
+  useEffect(() => {
+    if (hasBooted && soundEnabled) playHUDTransitionSound();
   },[location.pathname, hasBooted, soundEnabled]);
 
   return (
@@ -629,12 +548,7 @@ const AppContent = () => {
 
       <GridBackground />
       <ScrollToTop />
-      
-      {/* Pass sound props to Navbar */}
-      <Navbar 
-        soundEnabled={soundEnabled} 
-        toggleSound={() => setSoundEnabled(!soundEnabled)} 
-      />
+      <Navbar soundEnabled={soundEnabled} toggleSound={() => setSoundEnabled(!soundEnabled)} />
       
       <main className="relative pt-16 flex-grow">
         <AnimatePresence mode="wait">
@@ -648,7 +562,7 @@ const AppContent = () => {
               className="w-full h-full"
             >
               <Routes location={location}>
-                <Route path="/" element={<AboutPage />} />
+                <Route path="/" element={<AboutPage soundEnabled={soundEnabled} />} />
                 <Route path="/experience" element={<ExperiencePage />} />
                 <Route path="/projects" element={<ProjectsPage />} />
                 <Route path="/skills" element={<SkillsPage />} />
@@ -658,16 +572,11 @@ const AppContent = () => {
           )}
         </AnimatePresence>
       </main>
-      
       <Footer />
     </div>
   );
 };
 
 export default function App() {
-  return (
-    <Router>
-      <AppContent />
-    </Router>
-  );
+  return <Router><AppContent /></Router>;
 }
