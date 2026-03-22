@@ -138,7 +138,8 @@ const GridBackground = () => {
 // ✨ UPGRADED: Logs now only play once per session
 const SystemLogs = () => {
   const [logs, setLogs] = useState<{msg: string, time: string}[]>([]);
-  const logMessages =[
+  const [isComplete, setIsComplete] = useState(globalLogsDecrypted); // ← start true if already done
+  const logMessages = [
     "FETCHING EXP_LOGS...",
     "BYPASSING FIREWALL...",
     "DECRYPTING CLEARANCES...",
@@ -146,27 +147,30 @@ const SystemLogs = () => {
   ];
   
   useEffect(() => {
-    // If we already decrypted this session, show logs instantly!
     if (globalLogsDecrypted) {
-      const timestamp = new Date().toISOString().split('T')[1].slice(0,-1);
+      const timestamp = new Date().toISOString().split('T')[1].slice(0, -1);
       setLogs(logMessages.map(msg => ({ msg, time: timestamp })));
+      setIsComplete(true); // ← ensure green
       return;
     }
 
     let currentIndex = 0;
     const interval = setInterval(() => {
       if (currentIndex < logMessages.length) {
-        const timestamp = new Date().toISOString().split('T')[1].slice(0,-1);
+        const timestamp = new Date().toISOString().split('T')[1].slice(0, -1);
         setLogs(prev => [...prev, { msg: logMessages[currentIndex], time: timestamp }]);
         currentIndex++;
+        if (currentIndex === logMessages.length) {
+          globalLogsDecrypted = true;
+          setIsComplete(true); // ← turn green immediately when last log added
+        }
       } else {
         clearInterval(interval);
-        globalLogsDecrypted = true; 
       }
-    }, 400); 
+    }, 400);
     
     return () => clearInterval(interval);
-  },[]);
+  }, []);
 
   return (
     <div className="font-mono text-[#00f3ff] text-xs md:text-sm mb-12 bg-[#00f3ff]/5 p-4 border border-[#00f3ff]/20 rounded h-40 flex flex-col justify-end relative overflow-hidden shadow-[inset_0_0_20px_rgba(0,243,255,0.05)]">
@@ -174,7 +178,7 @@ const SystemLogs = () => {
       {logs.map((log, i) => (
         <motion.div key={i} initial={globalLogsDecrypted ? false : { opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="flex gap-3 mb-1">
           <span className="text-slate-500 opacity-70">[{log.time}]</span>
-          <span className={i === logMessages.length - 1 ? "text-green-400 font-bold" : ""}>{log.msg}</span>
+          <span className={i === logMessages.length - 1 && isComplete ? "text-green-400 font-bold" : ""}>{log.msg}</span>
         </motion.div>
       ))}
       <div className="w-2 h-4 bg-[#00f3ff] mt-1 animate-pulse" />
@@ -354,6 +358,16 @@ const AboutPage: React.FC<{ soundEnabled: boolean }> = ({ soundEnabled }) => (
             <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
             ACCESS_PROJECTS
           </Link>
+          <a 
+            href="/terri-tai-portfolio/resume.pdf"
+            target="_blank"
+            rel="noreferrer"
+            download="Terri_Tai_Resume.pdf"
+            className="flex items-center gap-2 px-8 py-4 border border-[#00f3ff]/30 text-white font-bold tracking-widest hover:border-[#00f3ff] hover:bg-[#00f3ff]/5 transition-all"
+          >
+            <ExternalLink className="w-4 h-4" />
+            DOWNLOAD_RESUME
+          </a>
           <a href="https://linkedin.com/in/terri-tai-732a21229" target="_blank" rel="noreferrer" className="px-8 py-4 border border-[#00f3ff]/30 text-white font-bold tracking-widest hover:border-[#00f3ff] hover:bg-[#00f3ff]/5 transition-all">
             ESTABLISH_LINK
           </a>
@@ -427,8 +441,12 @@ const ExperiencePage = () => {
   );
 };
 
-// ✨ UPGRADED: Expandable Project Cards
-const ProjectCard = ({ project }: { project: any }) => {
+// Expandable Project Cards
+interface ProjectCardProps {
+  project: any;
+}
+
+const ProjectCard = ({ project }: ProjectCardProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   return (
     <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.7, ease:[0.22, 1, 0.36, 1] }} className="h-full">
