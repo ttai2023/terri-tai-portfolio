@@ -5,7 +5,7 @@ export const PROJECTS: Project[] =[
     title: "Brain Tumor Segmentation",
     description: "Implemented a 2D U-Net CNN from scratch in PyTorch for automated segmentation on 4-channel multimodal MRI scans.",
     details: "Built entirely from scratch using PyTorch, this model addresses the heavy class imbalance between healthy tissue and tumor boundaries by implementing a custom Dice Loss function. Evaluated against the BraTS dataset, it successfully localizes heterogeneous tumor structures to assist in diagnostic accuracy.",
-    tags: ["Python", "PyTorch", "Computer Vision", "U-Net"],
+    tags: ["Python", "PyTorch", "Computer Vision", "U-Net", "Deep Learning", "ECE 176"],
     date: "Jan 2024 - Mar 2024",
     link: "https://github.com/ttai2023/emmywei-territai-ece176-finalproject"
   },
@@ -13,7 +13,7 @@ export const PROJECTS: Project[] =[
     title: "WayNo Smart Parallel Parking Robot",
     description: "Designed a real-time parallel parking algorithm leveraging sensor fusion and path planning in ROS2.",
     details: "Utilized a combination of HSV color masking, contour detection, and sensor data to allow a multi-agent robotic system to autonomously navigate and park. Achieved >95% accuracy in simulated Gazebo environments and physical testing.",
-    tags:["Python", "ROS2", "OpenCV", "Robotics"],
+    tags:["Python", "ROS2", "OpenCV", "Robotics", "ECE 148"],
     date: "Sep 2025 - Dec 2025",
     link: "https://github.com/UCSD-ECEMAE-148/fall-final-project-team-9"
   },
@@ -21,9 +21,17 @@ export const PROJECTS: Project[] =[
     title: "Professor Card Collector App",
     description: "Collaborated to build a card collector web app for UCSD professors in a team of 12. Voted best project in class.",
     details: "Acted in an Agile/SCRUM environment to map out UI/UX and database schemas. Allowed students to 'collect' trading cards of their favorite UCSD professors. Managed sprint planning, code reviews, and deployments.",
-    tags:["HTML", "CSS", "Javascript", "Agile/SCRUM"],
+    tags:["HTML", "CSS", "Javascript", "Agile/SCRUM", "CSE 110"],
     date: "Jan 2025 - Mar 2025",
     link: "https://github.com/cse110-sp25-group30/cse110-sp25-group30"
+  },
+  {
+    title: "Food Nutrition Analyzer",
+    description: "Developed a nutrition analysis tool that extracts and evaluates food data to provide detailed dietary insights.",
+    details: "Built during DiamondHacks 2025, this application analyzes food items using external nutrition APIs to return key metrics such as calories, macronutrients, and ingredient breakdowns. Designed a user-friendly interface for inputting food data and visualizing results, enabling users to make informed dietary decisions. Integrated backend logic for API handling, data parsing, and real-time feedback.",
+    tags: ["Python", "API Integration", "Data Analysis", "Hackathon"],
+    date: "2025",
+    link: "https://github.com/Akhil-py/DiamondHacks-FoodNutritionAnalyzer"
   },
   {
     title: "Text To Tracks Web App",
@@ -43,7 +51,6 @@ export const PROJECTS: Project[] =[
   }
 ];
 
-// ... (Keep the rest of your EXPERIENCES and SKILLS exactly the same below this!)
 export const EXPERIENCES: Experience[] =[
   {
     company: "Jacobs School of Engineering at UCSD",
