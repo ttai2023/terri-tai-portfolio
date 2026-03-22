@@ -98,7 +98,7 @@ const BootSequence: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
-  useEffect(() => { window.scrollTo({ top: 0, behavior: "instant" }); },[pathname]);
+  useEffect(() => { window.scrollTo({ top: 0, behavior: "smooth" }); },[pathname]);
   return null;
 };
 
@@ -135,54 +135,126 @@ const GridBackground = () => {
   );
 };
 
-// ✨ UPGRADED: Logs now only play once per session
-const SystemLogs = () => {
-  const [logs, setLogs] = useState<{msg: string, time: string}[]>([]);
-  const [isComplete, setIsComplete] = useState(globalLogsDecrypted); // ← start true if already done
-  const logMessages = [
-    "FETCHING EXP_LOGS...",
-    "BYPASSING FIREWALL...",
-    "DECRYPTING CLEARANCES...",
-    "LOGS UNLOCKED."
-  ];
-  
-  useEffect(() => {
-    if (globalLogsDecrypted) {
-      const timestamp = new Date().toISOString().split('T')[1].slice(0, -1);
-      setLogs(logMessages.map(msg => ({ msg, time: timestamp })));
-      setIsComplete(true); // ← ensure green
-      return;
-    }
-
-    let currentIndex = 0;
-    const interval = setInterval(() => {
-      if (currentIndex < logMessages.length) {
-        const timestamp = new Date().toISOString().split('T')[1].slice(0, -1);
-        setLogs(prev => [...prev, { msg: logMessages[currentIndex], time: timestamp }]);
-        currentIndex++;
-        if (currentIndex === logMessages.length) {
-          globalLogsDecrypted = true;
-          setIsComplete(true); // ← turn green immediately when last log added
-        }
-      } else {
-        clearInterval(interval);
-      }
-    }, 400);
-    
-    return () => clearInterval(interval);
-  }, []);
+const LockableCard: React.FC<{ exp: any; index: number }> = ({ exp, index }) => {
+  const [unlocked, setUnlocked] = useState(false);
 
   return (
-    <div className="font-mono text-[#00f3ff] text-xs md:text-sm mb-12 bg-[#00f3ff]/5 p-4 border border-[#00f3ff]/20 rounded h-40 flex flex-col justify-end relative overflow-hidden shadow-[inset_0_0_20px_rgba(0,243,255,0.05)]">
-      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#00f3ff]/30 to-transparent animate-[shimmer_2s_infinite]" />
-      {logs.map((log, i) => (
-        <motion.div key={i} initial={globalLogsDecrypted ? false : { opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="flex gap-3 mb-1">
-          <span className="text-slate-500 opacity-70">[{log.time}]</span>
-          <span className={i === logMessages.length - 1 && isComplete ? "text-green-400 font-bold" : ""}>{log.msg}</span>
-        </motion.div>
-      ))}
-      <div className="w-2 h-4 bg-[#00f3ff] mt-1 animate-pulse" />
-    </div>
+    <motion.div
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-100px" }}
+      transition={{ duration: 0.7, delay: index * 0.1, ease: [0.22, 1, 0.36, 1] }}
+    >
+      <SciFiPanel className="relative">
+        {/* Lock / Unlock button */}
+        <button
+          onClick={() => setUnlocked(true)}
+          className="absolute top-4 right-4 z-20 group/lock flex items-center gap-2"
+          aria-label={unlocked ? "Unlocked" : "Click to decrypt"}
+        >
+          <AnimatePresence mode="wait">
+            {!unlocked ? (
+              <motion.div
+                key="locked"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 1.3 }}
+                transition={{ duration: 0.2 }}
+                className="flex items-center gap-1.5 px-2 py-1 border border-[#00f3ff]/30 bg-[#00f3ff]/5 hover:border-[#00f3ff]/80 hover:bg-[#00f3ff]/10 transition-all"
+              >
+                {/* Lock SVG */}
+                <svg width="12" height="14" viewBox="0 0 12 14" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-[#00f3ff]/60 group-hover/lock:text-[#00f3ff] transition-colors">
+                  <rect x="1" y="6" width="10" height="7" rx="1" stroke="currentColor" strokeWidth="1.2"/>
+                  <path d="M3 6V4a3 3 0 016 0v2" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+                </svg>
+                <span className="font-mono text-[9px] tracking-widest text-[#00f3ff]/50 group-hover/lock:text-[#00f3ff] transition-colors">
+                  DECRYPT
+                </span>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="unlocked"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.3, type: "spring", stiffness: 300 }}
+                className="flex items-center gap-1.5 px-2 py-1 border border-green-400/40 bg-green-400/5"
+              >
+                {/* Unlock SVG */}
+                <svg width="12" height="14" viewBox="0 0 12 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="1" y="6" width="10" height="7" rx="1" stroke="#4ade80" strokeWidth="1.2"/>
+                  <path d="M3 6V4a3 3 0 016 0" stroke="#4ade80" strokeWidth="1.2" strokeLinecap="round"/>
+                </svg>
+                <span className="font-mono text-[9px] tracking-widest text-green-400">
+                  GRANTED
+                </span>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </button>
+
+        {/* Card header — always visible */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 border-b border-[#00f3ff]/20 pb-4 pr-24">
+          <div>
+            <h3 className="text-2xl font-bold text-white tracking-wide">{exp.role}</h3>
+            <p className="text-[#00f3ff] font-mono mt-1 flex items-center gap-2">
+              <span className="w-1.5 h-1.5 bg-[#00f3ff] rounded-full animate-pulse" />
+              {exp.company}
+            </p>
+          </div>
+          <div className="text-left md:text-right font-mono text-sm">
+            <p className="text-[#00f3ff]/80">[{exp.period}]</p>
+            <p className="text-slate-400 mt-1">{exp.location}</p>
+          </div>
+        </div>
+
+        {/* Content — locked/unlocked */}
+        <AnimatePresence mode="wait">
+          {!unlocked ? (
+            <motion.div
+              key="locked-content"
+              exit={{ opacity: 0, filter: "blur(4px)" }}
+              transition={{ duration: 0.2 }}
+              className="space-y-2"
+            >
+              {/* Redacted placeholder bars */}
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="flex gap-3 items-center">
+                  <span className="text-[#00f3ff]/20 mt-0.5">&gt;</span>
+                  <div
+                    className="h-3 bg-[#00f3ff]/10 rounded-sm animate-pulse"
+                    style={{ width: `${65 + i * 10}%`, animationDelay: `${i * 0.15}s` }}
+                  />
+                </div>
+              ))}
+              <p className="font-mono text-[10px] text-[#00f3ff]/30 tracking-widest mt-3">
+                // CLEARANCE REQUIRED — CLICK DECRYPT TO ACCESS
+              </p>
+            </motion.div>
+          ) : (
+            <motion.ul
+              key="unlocked-content"
+              initial={{ opacity: 0, filter: "blur(8px)" }}
+              animate={{ opacity: 1, filter: "blur(0px)" }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+              className="space-y-3"
+            >
+              {exp.description.map((item: string, i: number) => (
+                <motion.li
+                  key={i}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.06, duration: 0.3 }}
+                  className="flex gap-3 text-[#8ab4f8] font-mono text-sm leading-relaxed"
+                >
+                  <span className="text-[#00f3ff] mt-0.5">&gt;</span>
+                  <span>{item}</span>
+                </motion.li>
+              ))}
+            </motion.ul>
+          )}
+        </AnimatePresence>
+      </SciFiPanel>
+    </motion.div>
   );
 };
 
@@ -216,8 +288,9 @@ const SectionHeading: React.FC<{ children: ReactNode; icon: any }> = ({ children
 
 const Navbar: React.FC<{ soundEnabled: boolean, toggleSound: () => void }> = ({ soundEnabled, toggleSound }) => {
   const location = useLocation();
-  const navLinks =[
-    { name: 'SYSTEM_STATUS (ABOUT)', path: '/' },
+  const [menuOpen, setMenuOpen] = useState(false);
+  const navLinks = [
+    { name: 'SYSTEM_STATUS', path: '/' },
     { name: 'EXP_LOGS', path: '/experience' },
     { name: 'PROJECT_ARCHIVES', path: '/projects' },
     { name: 'TECH_ARSENAL', path: '/skills' },
@@ -226,6 +299,7 @@ const Navbar: React.FC<{ soundEnabled: boolean, toggleSound: () => void }> = ({ 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-[#020b12]/90 backdrop-blur-md border-b border-[#00f3ff]/30 shadow-[0_0_20px_rgba(0,243,255,0.1)]">
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+        {/* Logo */}
         <Link to="/" className="flex items-center gap-3">
           <div className="relative w-8 h-8 bg-[#00f3ff]/20 border border-[#00f3ff] flex items-center justify-center">
             <Cpu className="w-5 h-5 text-[#00f3ff]" />
@@ -235,6 +309,8 @@ const Navbar: React.FC<{ soundEnabled: boolean, toggleSound: () => void }> = ({ 
             T.TAI
           </span>
         </Link>
+
+        {/* Desktop nav */}
         <div className="hidden lg:flex items-center gap-8 text-xs font-mono tracking-widest text-[#00f3ff]/60">
           {navLinks.map((link) => (
             <Link key={link.name} to={link.path} className={`transition-all duration-300 hover:text-[#00f3ff] hover:drop-shadow-[0_0_8px_#00f3ff] ${location.pathname === link.path ? 'text-[#00f3ff] border-b border-[#00f3ff] pb-1' : ''}`}>
@@ -242,22 +318,66 @@ const Navbar: React.FC<{ soundEnabled: boolean, toggleSound: () => void }> = ({ 
             </Link>
           ))}
         </div>
+
+        {/* Right side icons */}
         <div className="flex items-center gap-2 md:gap-4 text-[#00f3ff]">
           <button onClick={toggleSound} className="flex items-center gap-2 px-2 py-1 md:px-3 md:py-2 hover:bg-[#00f3ff]/10 rounded border border-transparent hover:border-[#00f3ff]/50 transition-all text-xs font-mono mr-2" title="Toggle HUD Sounds">
             {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4 opacity-50" />}
             <span className="hidden sm:inline opacity-70">SND:{soundEnabled ? 'ON' : 'OFF'}</span>
           </button>
-          <div className="w-px h-6 bg-[#00f3ff]/30 mr-2" />
-          <a href="mailto:y2tai@ucsd.edu" className="p-2 hover:bg-[#00f3ff]/10 rounded border border-transparent hover:border-[#00f3ff]/50 transition-all"><Mail className="w-4 h-4 md:w-5 md:h-5" /></a>
-          <a href="https://github.com/ttai2023" target="_blank" rel="noreferrer" className="p-2 hover:bg-[#00f3ff]/10 rounded border border-transparent hover:border-[#00f3ff]/50 transition-all"><Github className="w-4 h-4 md:w-5 md:h-5" /></a>
-          <a href="https://linkedin.com/in/terri-tai-732a21229" target="_blank" rel="noreferrer" className="p-2 hover:bg-[#00f3ff]/10 rounded border border-transparent hover:border-[#00f3ff]/50 transition-all"><Linkedin className="w-4 h-4 md:w-5 md:h-5" /></a>
+          <div className="w-px h-6 bg-[#00f3ff]/30 mr-2 hidden sm:block" />
+          <a href="mailto:y2tai@ucsd.edu" className="p-2 hover:bg-[#00f3ff]/10 rounded border border-transparent hover:border-[#00f3ff]/50 transition-all hidden sm:block"><Mail className="w-4 h-4 md:w-5 md:h-5" /></a>
+          <a href="https://github.com/ttai2023" target="_blank" rel="noreferrer" className="p-2 hover:bg-[#00f3ff]/10 rounded border border-transparent hover:border-[#00f3ff]/50 transition-all hidden sm:block"><Github className="w-4 h-4 md:w-5 md:h-5" /></a>
+          <a href="https://linkedin.com/in/terri-tai-732a21229" target="_blank" rel="noreferrer" className="p-2 hover:bg-[#00f3ff]/10 rounded border border-transparent hover:border-[#00f3ff]/50 transition-all hidden sm:block"><Linkedin className="w-4 h-4 md:w-5 md:h-5" /></a>
+
+          {/* Hamburger — mobile only */}
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="lg:hidden flex flex-col justify-center items-center gap-1.5 w-8 h-8 ml-2"
+            aria-label="Toggle menu"
+          >
+            <span className={`block w-5 h-px bg-[#00f3ff] transition-all duration-300 ${menuOpen ? 'rotate-45 translate-y-[7px]' : ''}`} />
+            <span className={`block w-5 h-px bg-[#00f3ff] transition-all duration-300 ${menuOpen ? 'opacity-0' : ''}`} />
+            <span className={`block w-5 h-px bg-[#00f3ff] transition-all duration-300 ${menuOpen ? '-rotate-45 -translate-y-[7px]' : ''}`} />
+          </button>
         </div>
       </div>
+
+      {/* Mobile dropdown */}
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="lg:hidden overflow-hidden border-t border-[#00f3ff]/20 bg-[#020b12]/95 backdrop-blur-md"
+          >
+            <div className="px-6 py-4 flex flex-col gap-1 font-mono text-sm tracking-widest">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.name}
+                  to={link.path}
+                  onClick={() => setMenuOpen(false)}
+                  className={`py-3 border-b border-[#00f3ff]/10 transition-all ${location.pathname === link.path ? 'text-[#00f3ff]' : 'text-[#00f3ff]/50 hover:text-[#00f3ff]'}`}
+                >
+                  &gt; [{link.name}]
+                </Link>
+              ))}
+              {/* Social links in mobile menu */}
+              <div className="flex items-center gap-4 pt-4 text-[#00f3ff]/60">
+                <a href="mailto:y2tai@ucsd.edu" className="hover:text-[#00f3ff] transition-colors"><Mail className="w-5 h-5" /></a>
+                <a href="https://github.com/ttai2023" target="_blank" rel="noreferrer" className="hover:text-[#00f3ff] transition-colors"><Github className="w-5 h-5" /></a>
+                <a href="https://linkedin.com/in/terri-tai-732a21229" target="_blank" rel="noreferrer" className="hover:text-[#00f3ff] transition-colors"><Linkedin className="w-5 h-5" /></a>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   );
 };
 
-// ✨ UPGRADED: Added typing sound integration
+// Added typing sound effect
 const TerminalTypingEffect: React.FC<{ soundEnabled: boolean }> = ({ soundEnabled }) => {
   const[displayedText, setDisplayedText] = useState("");
   const fullText = "BUILDING FUTURE SYSTEMS...";
@@ -269,7 +389,7 @@ const TerminalTypingEffect: React.FC<{ soundEnabled: boolean }> = ({ soundEnable
       const intervalId = setInterval(() => {
         if (index <= fullText.length) {
           setDisplayedText(fullText.slice(0, index));
-          if (soundEnabled && index < fullText.length) playTypingSound(); // Play sound!
+          if (soundEnabled && index < fullText.length) playTypingSound();
           index++;
         } else {
           clearInterval(intervalId);
@@ -310,6 +430,65 @@ const TerminalTypingEffect: React.FC<{ soundEnabled: boolean }> = ({ soundEnable
   );
 };
 
+// scroll hint component for first-time visitors
+const ScrollHint = () => (
+  <motion.div
+    initial={{ opacity: 0 }}
+    animate={{ opacity: [0, 0.6, 0] }}
+    transition={{ delay: 3, duration: 2, repeat: Infinity, ease: "easeInOut" }}
+    className="absolute bottom-8 left-1/2 -translate-x-1/2 font-mono text-[10px] tracking-[0.3em] text-[#00f3ff]/60 whitespace-nowrap"
+  >
+    [ SELECT ROUTE VIA HUD ]
+  </motion.div>
+);
+
+const SendTransmission = () => {
+  const [copied, setCopied] = useState(false);
+  const email = "y2tai@ucsd.edu";
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(email);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 40 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 2.8, duration: 0.6 }}
+      className="w-full max-w-4xl mb-12 font-mono"
+    >
+      <SciFiPanel>
+        <div className="flex items-center gap-3 mb-4 border-b border-[#00f3ff]/20 pb-4">
+          <Mail className="w-5 h-5 text-[#00f3ff]" />
+          <span className="text-[#00f3ff] text-xs tracking-widest font-bold">SEND_TRANSMISSION</span>
+          <span className="ml-auto w-2 h-2 rounded-full bg-green-400 shadow-[0_0_8px_#4ade80] animate-pulse" />
+        </div>
+        <p className="text-[#8ab4f8] text-sm mb-4">&gt; Channel open. All transmissions reviewed.</p>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+          <code className="text-[#00f3ff] bg-[#00f3ff]/5 border border-[#00f3ff]/20 px-4 py-2 text-sm flex-1">
+            {email}
+          </code>
+          <button
+            onClick={handleCopy}
+            className="px-4 py-2 border border-[#00f3ff]/50 text-xs tracking-widest hover:bg-[#00f3ff]/10 hover:border-[#00f3ff] transition-all text-[#00f3ff] whitespace-nowrap"
+          >
+            {copied ? "✓ COPIED" : "COPY_ADDRESS"}
+          </button>
+          <a
+            href={`mailto:${email}`}
+            className="px-4 py-2 bg-[#00f3ff]/10 border border-[#00f3ff] text-xs tracking-widest hover:bg-[#00f3ff] hover:text-[#03101c] transition-all text-[#00f3ff] font-bold whitespace-nowrap"
+          >
+            OPEN_MAIL
+          </a>
+        </div>
+      </SciFiPanel>
+    </motion.div>
+  );
+};
+
+// about me section
 const AboutPage: React.FC<{ soundEnabled: boolean }> = ({ soundEnabled }) => (
   <section className="min-h-screen flex flex-col items-center justify-center px-6 py-12 md:py-12 relative">
     <motion.div 
@@ -374,9 +553,12 @@ const AboutPage: React.FC<{ soundEnabled: boolean }> = ({ soundEnabled }) => (
         </motion.div>
       </SciFiPanel>
     </motion.div>
+    <SendTransmission /> 
+    <ScrollHint />
   </section>
 );
 
+// technical and research experience section
 const ExperiencePage = () => {
   const researchLogs = EXPERIENCES.filter(exp => exp.role.toLowerCase().includes('research') || exp.company.toLowerCase().includes('lab'));
   const techExperiences = EXPERIENCES.filter(exp => !exp.role.toLowerCase().includes('research') && !exp.company.toLowerCase().includes('lab'));
