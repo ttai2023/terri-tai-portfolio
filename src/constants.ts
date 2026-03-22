@@ -97,7 +97,7 @@ export const EXPERIENCES: Experience[] =[
     company: "IEEE at UCSD - RoboCup Soccer",
     role: "Software Team Lead",
     period: "Oct 2023 - Dec 2025",
-    location: "San Diego, CA",
+    location: "La Jolla, CA",
     description:[
       "Directed a 25-person team to develop autonomous agents in Java for RoboCup Small-Sized League.",
       "Replaced legacy shape-based system with A* search algorithm, increasing navigation space by 75%.",
@@ -109,7 +109,7 @@ export const EXPERIENCES: Experience[] =[
     company: "Existential Robotics Lab (ERL)",
     role: "Undergraduate Researcher",
     period: "Jun 2025 - Aug 2025",
-    location: "La Jolla, CA",
+    location: "San Diego, CA",
     description:[
       "Integrated Particle Filter SLAM and implemented Kalman Filters for motion prediction.",
       "Validated algorithms in Gazebo simulations before deploying to physical multi-agent robotic systems."
