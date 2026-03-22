@@ -6,7 +6,7 @@ export const PROJECTS: Project[] =[
     description: "Implemented a 2D U-Net CNN from scratch in PyTorch for automated segmentation on 4-channel multimodal MRI scans.",
     details: "Built entirely from scratch using PyTorch, this model addresses the heavy class imbalance between healthy tissue and tumor boundaries by implementing a custom Dice Loss function. Evaluated against the BraTS dataset, it successfully localizes heterogeneous tumor structures to assist in diagnostic accuracy.",
     tags: ["Python", "PyTorch", "Computer Vision", "U-Net", "Deep Learning", "ECE 176"],
-    date: "Jan 2024 - Mar 2024",
+    date: "Jan 2026 - Mar 2026",
     link: "https://github.com/ttai2023/emmywei-territai-ece176-finalproject"
   },
   {

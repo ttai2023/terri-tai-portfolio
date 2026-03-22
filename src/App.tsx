@@ -135,6 +135,66 @@ const GridBackground = () => {
   );
 };
 
+const SystemLogs = ({ showUnlocked }: { showUnlocked: boolean }) => {
+  const [logs, setLogs] = useState<{msg: string, time: string}[]>([]);
+  const logMessages = [
+    "FETCHING EXP_LOGS...",
+    "BYPASSING FIREWALL...",
+    "DECRYPTING CLEARANCES...",
+    "AWAITING USER DECRYPTION...",
+  ];
+
+  useEffect(() => {
+    let currentIndex = 0;
+    const interval = setInterval(() => {
+      if (currentIndex < logMessages.length) {
+        const timestamp = new Date().toISOString().split('T')[1].slice(0, -1);
+        setLogs(prev => [...prev, { msg: logMessages[currentIndex], time: timestamp }]);
+        currentIndex++;
+      } else {
+        clearInterval(interval);
+      }
+    }, 400);
+    return () => clearInterval(interval);
+  }, []);
+
+  const displayLogs = showUnlocked && logs.length === logMessages.length
+    ? [...logs.slice(0, -1), { msg: "LOGS UNLOCKED.", time: logs[logs.length - 1]?.time ?? "" }]
+    : logs;
+
+  return (
+    <div className="font-mono text-[#00f3ff] text-xs md:text-sm mb-12 bg-[#00f3ff]/5 p-4 border border-[#00f3ff]/20 rounded h-40 flex flex-col justify-end relative overflow-hidden shadow-[inset_0_0_20px_rgba(0,243,255,0.05)]">
+      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#00f3ff]/30 to-transparent animate-[shimmer_2s_infinite]" />
+      {displayLogs.map((log, i) => (
+        <motion.div
+          key={log.msg}
+          initial={{ opacity: 0, x: -10 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.3 }}
+          className="flex gap-3 mb-1"
+        >
+          <span className="text-slate-500 opacity-70">[{log.time}]</span>
+          <span className={log.msg === "LOGS UNLOCKED." ? "text-green-400 font-bold" : ""}>
+            {log.msg}
+          </span>
+        </motion.div>
+      ))}
+      <div className="w-2 h-4 bg-[#00f3ff] mt-1 animate-pulse" />
+    </div>
+  );
+};
+
+const SciFiPanel: React.FC<{ children: ReactNode; className?: string }> = ({ children, className = '' }) => (
+  <div className={`relative bg-[#021b2b]/40 border border-[#00f3ff]/40 p-8 shadow-[0_0_15px_rgba(0,243,255,0.15)] backdrop-blur-sm group transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1 hover:bg-[#021b2b]/50 hover:border-[#00f3ff]/80 hover:shadow-[0_0_30px_rgba(0,243,255,0.4)] z-0 hover:z-10 ${className}`}>
+    <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-[#00f3ff] transition-all group-hover:scale-125 group-hover:border-[#00f3ff]" />
+    <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-[#00f3ff] transition-all group-hover:scale-125 group-hover:border-[#00f3ff]" />
+    <div className="absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2 border-[#00f3ff] transition-all group-hover:scale-125 group-hover:border-[#00f3ff]" />
+    <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-[#00f3ff] transition-all group-hover:scale-125 group-hover:border-[#00f3ff]" />
+    <div className="absolute inset-0 bg-gradient-to-b from-[#00f3ff]/5 to-transparent pointer-events-none transition-opacity group-hover:opacity-50" />
+    <div className="relative z-10">{children}</div>
+  </div>
+);
+
 const LockableCard: React.FC<{ exp: any; index: number }> = ({ exp, index }) => {
   const [unlocked, setUnlocked] = useState(false);
 
@@ -257,17 +317,6 @@ const LockableCard: React.FC<{ exp: any; index: number }> = ({ exp, index }) => 
     </motion.div>
   );
 };
-
-const SciFiPanel: React.FC<{ children: ReactNode; className?: string }> = ({ children, className = '' }) => (
-  <div className={`relative bg-[#021b2b]/40 border border-[#00f3ff]/40 p-8 shadow-[0_0_15px_rgba(0,243,255,0.15)] backdrop-blur-sm group transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1 hover:bg-[#021b2b]/50 hover:border-[#00f3ff]/80 hover:shadow-[0_0_30px_rgba(0,243,255,0.4)] z-0 hover:z-10 ${className}`}>
-    <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-[#00f3ff] transition-all group-hover:scale-125 group-hover:border-[#00f3ff]" />
-    <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-[#00f3ff] transition-all group-hover:scale-125 group-hover:border-[#00f3ff]" />
-    <div className="absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2 border-[#00f3ff] transition-all group-hover:scale-125 group-hover:border-[#00f3ff]" />
-    <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-[#00f3ff] transition-all group-hover:scale-125 group-hover:border-[#00f3ff]" />
-    <div className="absolute inset-0 bg-gradient-to-b from-[#00f3ff]/5 to-transparent pointer-events-none transition-opacity group-hover:opacity-50" />
-    <div className="relative z-10">{children}</div>
-  </div>
-);
 
 const SectionHeading: React.FC<{ children: ReactNode; icon: any }> = ({ children, icon: Icon }) => (
   <div className="flex items-center gap-4 mb-12">
@@ -560,60 +609,209 @@ const AboutPage: React.FC<{ soundEnabled: boolean }> = ({ soundEnabled }) => (
 
 // technical and research experience section
 const ExperiencePage = () => {
-  const researchLogs = EXPERIENCES.filter(exp => exp.role.toLowerCase().includes('research') || exp.company.toLowerCase().includes('lab'));
-  const techExperiences = EXPERIENCES.filter(exp => !exp.role.toLowerCase().includes('research') && !exp.company.toLowerCase().includes('lab'));
+  const [unlocked, setUnlocked] = useState(globalLogsDecrypted);
+
+  const researchLogs = EXPERIENCES.filter(exp =>
+    exp.role.toLowerCase().includes('research') || exp.company.toLowerCase().includes('lab')
+  );
+  const techExperiences = EXPERIENCES.filter(exp =>
+    !exp.role.toLowerCase().includes('research') && !exp.company.toLowerCase().includes('lab')
+  );
+
+  const handleUnlock = () => {
+    setUnlocked(true);
+    globalLogsDecrypted = true;
+  };
 
   return (
     <section className="max-w-7xl mx-auto px-6 py-24 min-h-screen">
-      <SystemLogs />
+      <SystemLogs showUnlocked={unlocked} />
+
+      {/* Single decrypt button */}
+      <div className="flex justify-center mb-16">
+        <AnimatePresence mode="wait">
+          {!unlocked ? (
+            <motion.button
+              key="locked"
+              onClick={handleUnlock}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 1.1 }}
+              transition={{ duration: 0.2 }}
+              className="group flex items-center gap-3 px-8 py-4 border border-[#00f3ff]/40 bg-[#00f3ff]/5 hover:border-[#00f3ff] hover:bg-[#00f3ff]/10 transition-all font-mono text-sm tracking-widest text-[#00f3ff]/70 hover:text-[#00f3ff]"
+            >
+              <svg width="14" height="16" viewBox="0 0 12 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="1" y="6" width="10" height="7" rx="1" stroke="currentColor" strokeWidth="1.2"/>
+                <path d="M3 6V4a3 3 0 016 0v2" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+              </svg>
+              DECRYPT_ALL_CLEARANCES
+            </motion.button>
+          ) : (
+            <motion.div
+              key="unlocked"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.3, type: "spring", stiffness: 300 }}
+              className="flex items-center gap-3 px-8 py-4 border border-green-400/40 bg-green-400/5 font-mono text-sm tracking-widest text-green-400"
+            >
+              <svg width="14" height="16" viewBox="0 0 12 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="1" y="6" width="10" height="7" rx="1" stroke="#4ade80" strokeWidth="1.2"/>
+                <path d="M3 6V4a3 3 0 016 0" stroke="#4ade80" strokeWidth="1.2" strokeLinecap="round"/>
+              </svg>
+              ACCESS_GRANTED
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      {/* Technical Experience */}
       <div className="mb-24">
         <SectionHeading icon={Rocket}>Technical Experience</SectionHeading>
         <div className="space-y-8">
           {techExperiences.map((exp, idx) => (
-            <motion.div key={`tech-${idx}`} initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.7, delay: idx * 0.1, ease:[0.22, 1, 0.36, 1] }}>
+            <motion.div
+              key={`tech-${idx}`}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.7, delay: idx * 0.1, ease: [0.22, 1, 0.36, 1] }}
+            >
               <SciFiPanel>
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 border-b border-[#00f3ff]/20 pb-4">
                   <div>
                     <h3 className="text-2xl font-bold text-white tracking-wide">{exp.role}</h3>
-                    <p className="text-[#00f3ff] font-mono mt-1 flex items-center gap-2"><span className="w-1.5 h-1.5 bg-[#00f3ff] rounded-full animate-pulse" />{exp.company}</p>
+                    <p className="text-[#00f3ff] font-mono mt-1 flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 bg-[#00f3ff] rounded-full animate-pulse" />
+                      {exp.company}
+                    </p>
                   </div>
                   <div className="text-left md:text-right font-mono text-sm">
                     <p className="text-[#00f3ff]/80">[{exp.period}]</p>
                     <p className="text-slate-400 mt-1">{exp.location}</p>
                   </div>
                 </div>
-                <ul className="space-y-3">
-                  {exp.description.map((item, i) => (
-                    <li key={i} className="flex gap-3 text-[#8ab4f8] font-mono text-sm leading-relaxed"><span className="text-[#00f3ff] mt-0.5">&gt;</span><span>{item}</span></li>
-                  ))}
-                </ul>
+
+                <AnimatePresence mode="wait">
+                  {!unlocked ? (
+                    <motion.div
+                      key="redacted"
+                      exit={{ opacity: 0, filter: "blur(4px)" }}
+                      transition={{ duration: 0.2 }}
+                      className="space-y-2"
+                    >
+                      {[...Array(3)].map((_, i) => (
+                        <div key={i} className="flex gap-3 items-center">
+                          <span className="text-[#00f3ff]/20">&gt;</span>
+                          <div
+                            className="h-3 bg-[#00f3ff]/10 rounded-sm animate-pulse"
+                            style={{ width: `${60 + i * 12}%`, animationDelay: `${i * 0.15}s` }}
+                          />
+                        </div>
+                      ))}
+                      <p className="font-mono text-[10px] text-[#00f3ff]/30 tracking-widest mt-3">
+                        // CLASSIFIED — DECRYPT TO ACCESS
+                      </p>
+                    </motion.div>
+                  ) : (
+                    <motion.ul
+                      key="revealed"
+                      initial={{ opacity: 0, filter: "blur(8px)" }}
+                      animate={{ opacity: 1, filter: "blur(0px)" }}
+                      transition={{ duration: 0.4, delay: idx * 0.05, ease: "easeOut" }}
+                      className="space-y-3"
+                    >
+                      {exp.description.map((item: string, i: number) => (
+                        <motion.li
+                          key={i}
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: idx * 0.05 + i * 0.06, duration: 0.3 }}
+                          className="flex gap-3 text-[#8ab4f8] font-mono text-sm leading-relaxed"
+                        >
+                          <span className="text-[#00f3ff] mt-0.5">&gt;</span>
+                          <span>{item}</span>
+                        </motion.li>
+                      ))}
+                    </motion.ul>
+                  )}
+                </AnimatePresence>
               </SciFiPanel>
             </motion.div>
           ))}
         </div>
       </div>
 
+      {/* Research Logs */}
       <div>
         <SectionHeading icon={Microscope}>Research Logs</SectionHeading>
         <div className="space-y-8">
           {researchLogs.map((exp, idx) => (
-            <motion.div key={`research-${idx}`} initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.7, delay: idx * 0.1, ease:[0.22, 1, 0.36, 1] }}>
+            <motion.div
+              key={`research-${idx}`}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.7, delay: idx * 0.1, ease: [0.22, 1, 0.36, 1] }}
+            >
               <SciFiPanel>
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 border-b border-[#00f3ff]/20 pb-4">
                   <div>
                     <h3 className="text-2xl font-bold text-white tracking-wide">{exp.role}</h3>
-                    <p className="text-[#00f3ff] font-mono mt-1 flex items-center gap-2"><span className="w-1.5 h-1.5 bg-[#00f3ff] rounded-full animate-pulse" />{exp.company}</p>
+                    <p className="text-[#00f3ff] font-mono mt-1 flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 bg-[#00f3ff] rounded-full animate-pulse" />
+                      {exp.company}
+                    </p>
                   </div>
                   <div className="text-left md:text-right font-mono text-sm">
                     <p className="text-[#00f3ff]/80">[{exp.period}]</p>
                     <p className="text-slate-400 mt-1">{exp.location}</p>
                   </div>
                 </div>
-                <ul className="space-y-3">
-                  {exp.description.map((item, i) => (
-                    <li key={i} className="flex gap-3 text-[#8ab4f8] font-mono text-sm leading-relaxed"><span className="text-[#00f3ff] mt-0.5">&gt;</span><span>{item}</span></li>
-                  ))}
-                </ul>
+
+                <AnimatePresence mode="wait">
+                  {!unlocked ? (
+                    <motion.div
+                      key="redacted"
+                      exit={{ opacity: 0, filter: "blur(4px)" }}
+                      transition={{ duration: 0.2 }}
+                      className="space-y-2"
+                    >
+                      {[...Array(3)].map((_, i) => (
+                        <div key={i} className="flex gap-3 items-center">
+                          <span className="text-[#00f3ff]/20">&gt;</span>
+                          <div
+                            className="h-3 bg-[#00f3ff]/10 rounded-sm animate-pulse"
+                            style={{ width: `${60 + i * 12}%`, animationDelay: `${i * 0.15}s` }}
+                          />
+                        </div>
+                      ))}
+                      <p className="font-mono text-[10px] text-[#00f3ff]/30 tracking-widest mt-3">
+                        // CLASSIFIED — DECRYPT TO ACCESS
+                      </p>
+                    </motion.div>
+                  ) : (
+                    <motion.ul
+                      key="revealed"
+                      initial={{ opacity: 0, filter: "blur(8px)" }}
+                      animate={{ opacity: 1, filter: "blur(0px)" }}
+                      transition={{ duration: 0.4, delay: idx * 0.05, ease: "easeOut" }}
+                      className="space-y-3"
+                    >
+                      {exp.description.map((item: string, i: number) => (
+                        <motion.li
+                          key={i}
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: idx * 0.05 + i * 0.06, duration: 0.3 }}
+                          className="flex gap-3 text-[#8ab4f8] font-mono text-sm leading-relaxed"
+                        >
+                          <span className="text-[#00f3ff] mt-0.5">&gt;</span>
+                          <span>{item}</span>
+                        </motion.li>
+                      ))}
+                    </motion.ul>
+                  )}
+                </AnimatePresence>
               </SciFiPanel>
             </motion.div>
           ))}
