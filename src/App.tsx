@@ -1,12 +1,11 @@
 import React, { useState, useEffect, ReactNode } from 'react';
 import { HashRouter as Router, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-// ✨ Added Volume2 and VolumeX icons for the sound toggle
 import { Cpu, Github, Linkedin, Mail, ExternalLink, Code2, Brain, Rocket, Target, Microscope, Volume2, VolumeX } from 'lucide-react';
 import { PROJECTS, EXPERIENCES, SKILLS } from './constants';
 
 // --- SYNTHESIZED HUD AUDIO --- //
-// Generates a digital "swoosh/blip" dynamically so you don't need MP3 files!
+// Generates a digital sound dynamically 
 const playHUDTransitionSound = () => {
   try {
     const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
@@ -25,7 +24,7 @@ const playHUDTransitionSound = () => {
     osc.frequency.exponentialRampToValueAtTime(300, ctx.currentTime + 0.15);
     
     // Volume envelope (quiet, quick fade out)
-    gain.gain.setValueAtTime(0.02, ctx.currentTime); // 👈 Very low volume so it's subtle
+    gain.gain.setValueAtTime(0.02, ctx.currentTime); 
     gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
     
     osc.start(ctx.currentTime);
@@ -211,7 +210,6 @@ const SectionHeading: React.FC<{ children: ReactNode; icon: any }> = ({ children
 
 // --- MAIN PORTFOLIO SECTIONS --- //
 
-// ✨ UPGRADED: Navbar now accepts sound toggle props
 const Navbar: React.FC<{ soundEnabled: boolean, toggleSound: () => void }> = ({ soundEnabled, toggleSound }) => {
   const location = useLocation();
   
@@ -332,16 +330,14 @@ const TerminalTypingEffect = () => {
   );
 };
 
+
 const AboutPage = () => (
-  // 1. Increased py-12 to py-32 md:py-40 to push it away from the header/footer
   <section className="min-h-screen flex flex-col items-center justify-center px-6 py-12 md:py-12 relative">
     <motion.div 
-      // 2. Removed the clipPath that was chopping off the glowing shadow!
-      // 3. Replaced it with the same smooth y-axis fade-in used on the other pages
       initial={{ opacity: 0, y: 40 }} 
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, ease:[0.22, 1, 0.36, 1], delay: 0.2 }}
-      className="w-full max-w-4xl my-12" // Added my-12 for extra vertical breathing room
+      className="w-full max-w-4xl my-12" 
     >
       <SciFiPanel className="text-center py-20">
         <motion.div 
@@ -364,7 +360,7 @@ const AboutPage = () => (
         >
           <p>&gt; Subject: Terri Yu Chen Tai.</p>
           <p>&gt; Specialization: Autonomous Systems, Robotics & AI.</p>
-          <p>&gt; Current Directive:</p>
+          <p>&gt; Current Directives:</p>
           <div className="pl-6 md:pl-10 ml-2 mt-2 space-y-2 border-l border-[#00f3ff]/40 text-[#00f3ff]">
             <p className="flex items-start gap-2">
               <span className="text-slate-500">|-</span> 
@@ -396,7 +392,7 @@ const AboutPage = () => (
             ACCESS_PROJECTS
           </Link>
           <a href="https://linkedin.com/in/terri-tai-732a21229" target="_blank" rel="noreferrer" className="px-8 py-4 border border-[#00f3ff]/30 text-white font-bold tracking-widest hover:border-[#00f3ff] hover:bg-[#00f3ff]/5 transition-all">
-            ESTABLISH_UPLINK
+            ESTABLISH_LINK
           </a>
         </motion.div>
       </SciFiPanel>
