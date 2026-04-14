@@ -2,6 +2,14 @@ import { Project, Experience, SkillGroup } from './types';
 
 export const PROJECTS: Project[] =[
   {
+    title: "Rate My Schedule",
+    description: "Built a Chrome extension that automates UCSD course planning and enrollment for Diamond Hacks 2026.",
+    details: "Reads the student's DARS degree audit via content script injection, scrapes RateMyProfessor and CAPE evaluations, and generates conflict-free schedule combinations ranked by weighted priority scoring using reciprocal rank-order centroid weighting. Auto-enrolls in WebReg at pass time via the Browser Use cloud SDK. Stack: Chrome extension (vanilla JS), Express/Node.js backend, SQLite via better-sqlite3.",
+    tags: ["JavaScript", "Node.js", "Express", "SQLite", "Chrome Extension", "Browser Use SDK", "Hackathon"],
+    date: "Mar 2026",
+    link: "https://github.com/ttai2023/ratemyschedule"
+  },
+  {
     title: "Brain Tumor Segmentation",
     description: "Implemented a 2D U-Net CNN from scratch in PyTorch for automated segmentation on 4-channel multimodal MRI scans.",
     details: "Built entirely from scratch using PyTorch, this model addresses the heavy class imbalance between healthy tissue and tumor boundaries by implementing a custom Dice Loss function. Evaluated against the BraTS dataset, it successfully localizes heterogeneous tumor structures to assist in diagnostic accuracy with a 0.83 validation dice score.",
@@ -30,7 +38,7 @@ export const PROJECTS: Project[] =[
     description: "Developed a nutrition analysis tool that extracts and evaluates food data to provide detailed dietary insights.",
     details: "Built during DiamondHacks 2025, this application analyzes food items using external nutrition APIs to return key metrics such as calories, macronutrients, and ingredient breakdowns. Designed a user-friendly interface for inputting food data and visualizing results, enabling users to make informed dietary decisions. Integrated backend logic for API handling, data parsing, and real-time feedback.",
     tags: ["Python", "API Integration", "Data Analysis", "Hackathon"],
-    date: "2025",
+    date: "Mar 2025",
     link: "https://github.com/Akhil-py/DiamondHacks-FoodNutritionAnalyzer"
   },
   {
@@ -38,7 +46,7 @@ export const PROJECTS: Project[] =[
     description: "Collaborated to create a web app that transforms articles into TikTok-style videos with subtitles.",
     details: "Built in 48 hours for DiamondHacks 2024 (Honorable Mention). Uses Python web-scraping to ingest scholarly articles and dynamically overlays text onto 'Subway Surfers' gameplay footage to increase Gen-Z viewer retention.",
     tags:["Python", "CSS", "Hackathon"],
-    date: "2024",
+    date: "Mar 2024",
     link: "https://github.com/danielbonkowsky/subwaysurfers-text"
   },
   {
@@ -46,7 +54,7 @@ export const PROJECTS: Project[] =[
     description: "Constructed a facial recognition algorithm using OpenCV to identify targets and assist in emotion recognition.",
     details: "Leveraged pre-trained cascade classifiers and customized facial mapping algorithms to identify user emotions in real-time, aiming to assist neurodivergent individuals in navigating relationship interactions.",
     tags:["Python", "OpenCV", "AI"],
-    date: "2024",
+    date: "Jul 2024 - Aug 2024",
     link: "https://github.com/marcokrause7/EQ-Glasses"
   }
 ];
