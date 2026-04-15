@@ -6,7 +6,7 @@ export const PROJECTS: Project[] =[
     description: "Built a Chrome extension that automates UCSD course planning and enrollment for Diamond Hacks 2026.",
     details: "Reads the student's DARS degree audit via content script injection, scrapes RateMyProfessor and CAPE evaluations, and generates conflict-free schedule combinations ranked by weighted priority scoring using reciprocal rank-order centroid weighting. Auto-enrolls in WebReg at pass time via the Browser Use cloud SDK. Stack: Chrome extension (vanilla JS), Express/Node.js backend, SQLite via better-sqlite3.",
     tags: ["JavaScript", "Node.js", "Express", "SQLite", "Chrome Extension", "Browser Use SDK", "Hackathon"],
-    date: "Mar 2026",
+    date: "Apr 2026",
     link: "https://github.com/ttai2023/ratemyschedule"
   },
   {
