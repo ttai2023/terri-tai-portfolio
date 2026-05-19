@@ -597,10 +597,10 @@ const AboutPage: React.FC<{ soundEnabled: boolean }> = ({ soundEnabled }) => (
           <div className="pl-6 md:pl-10 ml-2 mt-2 space-y-2 border-l border-[#00f3ff]/40 text-[#00f3ff]">
             <p className="flex items-start gap-2"><span className="text-slate-500">|-</span> CSE Tutor @ CSE Department UCSD.</p>
             <p className="flex items-start gap-2"><span className="text-slate-500">|-</span> ELC Tutor @ Jacobs School of Engineering UCSD.</p>
-            <p className="flex items-start gap-2"><span className="text-slate-500">|-</span> Technical Development: Projects @ WIC UCSD.</p>
-            <p className="flex items-start gap-2"><span className="text-slate-500">|-</span> Hard Hack Director @ HKN UCSD.</p>
+            <p className="flex items-start gap-2"><span className="text-slate-500">|-</span> Vice President Internal @ WIC UCSD.</p>
+            <p className="flex items-start gap-2"><span className="text-slate-500">|-</span> Publicity Chair @ HKN UCSD.</p>
           </div>
-          <p>&gt; Status: Open to Internships 2026</p>
+          <p>&gt; Status: Incoming SDE Intern at Amazon AWS Summer 2026</p>
         </motion.div>
 
         <motion.div 
