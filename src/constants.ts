@@ -61,6 +61,17 @@ export const PROJECTS: Project[] =[
 
 export const EXPERIENCES: Experience[] =[
   {
+    company: "AWS Cryptography — Secure Channel Systems, Amazon",
+    role: "Software Development Engineer Intern",
+    period: "Jun 2026 - Sep 2026",
+    location: "Seattle, WA",
+    description:[
+      "Designed and built a Java service for an internal Public Key Infrastructure (PKI) that reads allowlisting configuration from AWS AppConfig, replacing a hardcoded service-principals list with dynamic configuration.",
+      "Built and shipped a distributed deployment pipeline propagating configuration changes across all customer cells in every AWS region, cutting rollout time from 2 weeks to 3-4 hours (>95%).",
+      "Built with Java and TypeScript for encrypted, mutually authenticated service communication across a multi-region infrastructure system."
+    ]
+  },
+  {
     company: "Jacobs School of Engineering at UCSD",
     role: "Engineering Learning Community (ELC) Tutor",
     period: "Sep 2025 - Present",
@@ -72,8 +83,8 @@ export const EXPERIENCES: Experience[] =[
   },
   {
     company: "Women in Computing (WIC) at UCSD",
-    role: "Tech Dev Projects Chair",
-    period: "Sep 2025 - Present",
+    role: "Technical Development: Projects Chair",
+    period: "Sep 2025 - May 2026",
     location: "La Jolla, CA",
     description:[
       "Manage 12+ student project teams (groups of 5) each quarter, providing ongoing mentorship and technical guidance.",
